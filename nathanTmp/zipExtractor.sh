@@ -6,7 +6,7 @@
 # * <extracted directory name>/virgo/log.log
 
 # Usage: 
-# $ bash virgoZip2Text.sh <system log ZIP file>
+# $ bash zipExtractor.sh <system log ZIP file>
 
 if [[ -f $1 ]] && [[ $(unzip -t $1) ]]; then
     echo "Loaded the ZIP file $1."
