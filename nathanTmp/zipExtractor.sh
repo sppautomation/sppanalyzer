@@ -33,8 +33,10 @@ ERR_FILE_NOT_EXIST="Please download a new system log again and retry. \
 If you keep seeing this error message, please contact IBM Spectrum Protect \
 Plus Cusotmer Support."
 
-if [[ ! -f PATH_VIRGO/virgo/log.log ]]; then
-    echo "Could not find the file 'virgo/log.log'."
+REQUIRED_FILE01="$PATH_VIRGO/virgo/log.log"
+
+if [[ ! -f $REQUIRED_FILE01 ]]; then
+    echo "Could not find the file '$REQUIRED_FILE01'."
     echo $ERR_FILE_NOT_EXIST
     echo "Aborting."
     exit 1
