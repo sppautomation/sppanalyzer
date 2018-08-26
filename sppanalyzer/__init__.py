@@ -24,9 +24,12 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
+    # a simple page
     @app.route('/test')
     def hello():
         return 'This is a test of the emergency broadcast system.'
+
+    from . import upload
+    app.register_blueprint(upload.bp)
 
     return app

@@ -1,0 +1,43 @@
+<!doctype html>
+<head>
+<script type=text/javascript src="{{url_for('static', filename='jquery-3.3.1.min.js')}}"></script>
+<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='upload.css')}}"/>
+</head>
+<title>SPP Log Analyzer</title>
+<div id="uploadBody">
+	<h1 class="log-style">SPP Log Analyzer</h1>
+	<div class="upload-form-wrapper">
+		<h2 class="log-style">Upload a system log zip file</h3>
+			<form name="uploadForm" method="post" enctype="multipart/form-data">
+					<input type="file" name="file" id="file" class="inputfile" />
+					<label for="file"><span>Choose File</span></label>
+					</br>
+					<input class="inputfile" name="uploadbtn" type="submit" value="Upload">
+					<label for="uploadbtn" onclick="uploadForm.submit()">Upload</label>
+			</form>
+	</div>
+</div>
+
+<script>
+	var inputs = document.querySelectorAll( '#file' );
+	Array.prototype.forEach.call( inputs, function( input )
+	{
+		var label	 = input.nextElementSibling,
+			labelVal = label.innerHTML;
+	
+		input.addEventListener( 'change', function( e )
+		{
+			var fileName = '';
+		if(this.files && this.files.length > 1)
+			fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
+		else
+			fileName = e.target.value.split( '\\' ).pop();
+
+		if( fileName )
+			label.querySelector( 'span' ).innerHTML = fileName;
+		else
+			label.innerHTML = labelVal;
+		});
+	});
+
+</script>
