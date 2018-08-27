@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 0.1. Sun Aug 26 22:15:35 DST 2018
+# Version 0.2. Mon Aug 27 08:14:00 DST 2018
 # 
 # Returns all the records associated with a given job ID.
 # 
@@ -23,11 +23,12 @@ fi
 
 JOBID_SYNTAX="[0-9]{13}"
 if [[ $2 =~ $JOBID_SYNTAX ]]; then
-    RECORDS_ALL_HEAD=$(grep -n "\[20..-..-.. ..:..:......\] .* $2 " $1)
+    RECORDS_ALL_HEAD=$(grep -n \
+        "\[20..-..-.. ..:..:......\] .*[^0-9a-zA-Z]$2[^0-9a-zA-Z]" $1)
 elif [[ $2 == "ALL" ]]; then
-    RECORDS_ALL_HEAD=$(grep -n "\[20..-..-.. ..:..:......\] .* "    $1)
+    RECORDS_ALL_HEAD=$(grep -n "\[20..-..-.. ..:..:......\] .* "   $1)
 elif [[ $2 == "OTHERS" ]]; then
-    RECORDS_ALL_HEAD=$(grep -n "\[20..-..-.. ..:..:......\] .* "    $1 \
+    RECORDS_ALL_HEAD=$(grep -n "\[20..-..-.. ..:..:......\] .* "   $1 \
         | grep -v " [0-9]\{13\} ")
 else
     echo "Invalid job ID was given. Please enter a valid 13-digit job ID, \
@@ -52,28 +53,30 @@ else
 fi
 
 RECORDS_INFO=$(\
-    if [[ "$MODE" == "1" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "5" ]]\
-        || [[ "$MODE" == "7" ]]
-    then
-        echo "$RECORDS_ALL_HEAD" | grep " INFO "
-    fi)
+if [[ "$MODE" == "1" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "5" ]]\
+    || [[ "$MODE" == "7" ]] && echo "$RECORDS_ALL_HEAD" | grep -q " INFO "
+then
+    echo "$RECORDS_ALL_HEAD" | grep " INFO "
+#    echo "FOOO\n"
+fi)
 
 RECORDS_WARN=$(\
-    if [[ "$MODE" == "2" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "6" ]]\
-        || [[ "$MODE" == "7" ]]
-    then
-        echo "$RECORDS_ALL_HEAD" | grep " WARN "
-    fi)
+if [[ "$MODE" == "2" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "6" ]]\
+    || [[ "$MODE" == "7" ]] && echo "$RECORDS_ALL_HEAD" | grep -q " WARN "
+then
+    echo "$RECORDS_ALL_HEAD" | grep " WARN "
+#    echo "BAAA\n"
+fi)
 
 RECORDS_ERROR=$(\
-    if [[ "$MODE" == "4" ]] || [[ "$MODE" == "5" ]] || [[ "$MODE" == "6" ]]\
-        || [[ "$MODE" == "7" ]]
-    then
-        echo "$RECORDS_ALL_HEAD" | grep " ERROR "
-    fi)
+if [[ "$MODE" == "4" ]] || [[ "$MODE" == "5" ]] || [[ "$MODE" == "6" ]]\
+    || [[ "$MODE" == "7" ]] && echo "$RECORDS_ALL_HEAD" | grep -q " ERROR "
+then
+    echo "$RECORDS_ALL_HEAD" | grep " ERROR "
+fi)
 
-RECORDS_ALL="${RECORDS_INFO}\n${RECORDS_WARN}\n${RECORDS_ERROR}"
-echo -e "$RECORDS_ALL" | sort -t ':' -k 1 | cut -d ':' -f 2-
+RECORDS_ALL="${RECORDS_INFO}${RECORDS_WARN}${RECORDS_ERROR}"
+echo -e "$RECORDS_ALL" | sed 's/^\n//g' | sort -t ':' -k 1 | cut -d ':' -f 2-
 
 exit $?
 
