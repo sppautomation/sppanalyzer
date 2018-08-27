@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 0.1. Sun Aug 26 22:15:35 DST 2018
+# Version 0.2. Mon Aug 27 15:15:25 DST 2018
 # 
 # Creates a job index as a CSV file ./virgoLogIndex.csv .
 # 
@@ -38,7 +38,7 @@ TIMESTAMP_EPOCH=$(echo "$JOBIDS" | cut -c 1-10)
 TIMESTAMP_UTC=$(echo "$JOBHEADERS" | cut -c 2-24)
 
 JOBNAMES=$(echo "$JOBHEADERS" | cut -c 172- | rev | cut -d ' ' -f 14- | rev \
-    | sed 's/,/\,/g')
+    | sed 's/,/\\,/g')
 
 JOBTYPES=$(echo "$JOBNAMES" | cut -d '_' -f 1)
 
