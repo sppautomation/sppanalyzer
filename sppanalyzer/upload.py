@@ -1,7 +1,5 @@
 import os
-import zipfile
-import gzip
-from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template
+from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = '/sppanalyzer/upload'
@@ -20,36 +18,19 @@ def allowed_file(filename):
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
-            return 'No file selected'
+            return jsonify({"status":"No file selected"})
         file = request.files['file']
         if file.filename == '':
-            return 'No file selected'
+            return jsonify({"status":"No file selected"})
         if file and not allowed_file(file.filename):
-            return 'Extension not allowed'
+            return jsonify({"status":"Extension not allowed"})
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             fullfilepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             if not os.path.exists(fullfilepath):
                 os.makedirs(fullfilepath)
             file.save(os.path.join(fullfilepath, filename))
-            unpack_log_file(fullfilepath, filename)
-            return 'Complete'
+            return jsonify({"status":"Complete","fullfilepath":fullfilepath,"filename":filename})
+    #for GET return page template
     return render_template('upload.html')
-
-def unpack_log_file(fullfilepath, filename):
-    zip = zipfile.ZipFile(os.path.join(fullfilepath, filename), 'r')
-    zip.extractall(fullfilepath)
-    zip.close()
-    os.remove(os.path.join(fullfilepath, filename))
-    for root, directories, filenames in os.walk(fullfilepath):
-        for filename in filenames:
-            if filename.endswith(".gz"):
-                infile = gzip.GzipFile(os.path.join(root,filename), 'rb')
-                content = infile.read()
-                infile.close()
-                newfilename = filename.replace('.gz', '')
-                outfile = open(os.path.join(root,newfilename), 'wb')
-                outfile.write(content)
-                outfile.close()
-                os.remove(os.path.join(root,filename))
 

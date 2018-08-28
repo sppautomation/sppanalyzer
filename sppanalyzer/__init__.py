@@ -32,4 +32,10 @@ def create_app(test_config=None):
     from . import upload
     app.register_blueprint(upload.bp)
 
+    from . import unpack
+    app.register_blueprint(unpack.bp)
+
+    from . import analyze
+    app.register_blueprint(analyze.bp)
+
     return app

@@ -68,15 +68,31 @@
 				status.html("Uploading")
 				var percentVal = percentComplete + '%';
 				percent.html(percentVal);
-				if(percentComplete == 100) {
-					status.html("Analyzing");
-					percent.addClass("hiddenvis");
-				}
         		},
 			complete: function(xhr) {
-            			status.html(xhr.responseText);
+            			status.html(xhr.responseJSON.status);
 				status.removeClass("blinking-div");
+				percent.addClass("hiddenvis");
+				unpackLogs(xhr.responseJSON.fullfilepath, xhr.responseJSON.filename);
         		}
 		});
 	}); 
+		
+	function unpackLogs(fullfilepath, filename) {
+                var status = $('#status');
+		encodedfilepath = encodeURIComponent(fullfilepath)
+		unpackurl = "/unpack?fullfilepath=" + encodedfilepath + "&filename=" + filename
+		$.ajax({
+			type: "POST",
+			url: unpackurl,
+			beforeSend: function() {
+				status.addClass("blinking-div");
+				status.html("Unpacking");
+			},
+			complete: function(xhr) {
+				status.removeClass("blinking-div");
+				status.html(xhr.responseJSON.status);
+			}
+		});
+	}
 </script>
