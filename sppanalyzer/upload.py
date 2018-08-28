@@ -1,5 +1,6 @@
 import os
 import zipfile
+import gzip
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template
 from werkzeug.utils import secure_filename
 
@@ -19,12 +20,12 @@ def allowed_file(filename):
 def upload_file():
     if request.method == 'POST':
         if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
+            return 'No file selected'
         file = request.files['file']
         if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
+            return 'No file selected'
+        if file and not allowed_file(file.filename):
+            return 'Extension not allowed'
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             fullfilepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -32,11 +33,23 @@ def upload_file():
                 os.makedirs(fullfilepath)
             file.save(os.path.join(fullfilepath, filename))
             unpack_log_file(fullfilepath, filename)
-            flash('File uploaded.')
-            return 'File uploaded!'
+            return 'Complete'
     return render_template('upload.html')
 
 def unpack_log_file(fullfilepath, filename):
     zip = zipfile.ZipFile(os.path.join(fullfilepath, filename), 'r')
     zip.extractall(fullfilepath)
     zip.close()
+    os.remove(os.path.join(fullfilepath, filename))
+    for root, directories, filenames in os.walk(fullfilepath):
+        for filename in filenames:
+            if filename.endswith(".gz"):
+                infile = gzip.GzipFile(os.path.join(root,filename), 'rb')
+                content = infile.read()
+                infile.close()
+                newfilename = filename.replace('.gz', '')
+                outfile = open(os.path.join(root,newfilename), 'wb')
+                outfile.write(content)
+                outfile.close()
+                os.remove(os.path.join(root,filename))
+

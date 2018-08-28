@@ -51,3 +51,27 @@ body {
 	text-transform: uppercase;
 }
 
+#percent {
+	display: inline-block;
+	border-radius: 5px;
+}
+
+#status {
+	display: inline-block;
+	border-radius: 5px;
+}
+
+.hiddenvis {
+	visibility: hidden;
+}
+
+.blinking-div {
+	display: inline-block;
+	animation: blinker 1s linear infinite;
+}
+	
+@keyframes blinker {
+	50% {
+		background-color: darkgrey;
+	}
+}

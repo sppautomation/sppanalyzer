@@ -1,20 +1,26 @@
 <!doctype html>
 <head>
 <script type=text/javascript src="{{url_for('static', filename='jquery-3.3.1.min.js')}}"></script>
+<script type=text/javascript src="{{url_for('static', filename='jquery.form.min.js')}}"></script>
 <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='upload.css')}}"/>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
 <title>SPP Log Analyzer</title>
 <div id="uploadBody">
 	<h1 class="log-style">SPP Log Analyzer</h1>
 	<div class="upload-form-wrapper">
-		<h2 class="log-style">Upload a system log zip file</h3>
-			<form name="uploadForm" method="post" enctype="multipart/form-data">
-					<input type="file" name="file" id="file" class="inputfile" />
-					<label for="file"><span>Choose File</span></label>
-					</br>
-					<input class="inputfile" name="uploadbtn" type="submit" value="Upload">
-					<label for="uploadbtn" onclick="uploadForm.submit()">Upload</label>
-			</form>
+		<h2 class="log-style">Upload a system log zip file</h2>
+		<form id="uploadForm" name="uploadForm" method="post" enctype="multipart/form-data">
+			<input type="file" name="file" id="file" class="inputfile" />
+			<label for="file"><span>Choose File</span></label>
+			</br>
+			<input class="inputfile" name="uploadbtn" type="submit" value="Upload">
+			<label id="uploadSubmit" for="uploadbtn">Upload</label>
+		</form>
+		<div class="progress">
+    			<div class="hiddenvis" id="percent">0%</div ></br>
+			<div class="hiddenvis" id="status">STATUS</div >
+		</div>
 	</div>
 </div>
 
@@ -40,4 +46,37 @@
 		});
 	});
 
+	$( "#uploadSubmit" ).click(function() {
+  		$( "#uploadForm" ).submit();
+	});
+
+	$(function() {
+
+    		var percent = $('#percent');
+    		var status = $('#status');
+
+    		$('#uploadForm').ajaxForm({
+			beforeSend: function() {
+				status.empty();
+				var percentVal = '0%';
+				percent.html(percentVal);
+				status.removeClass("hiddenvis");
+				percent.removeClass("hiddenvis");
+				status.addClass("blinking-div");
+        		},
+			uploadProgress: function(event, position, total, percentComplete) {
+				status.html("Uploading")
+				var percentVal = percentComplete + '%';
+				percent.html(percentVal);
+				if(percentComplete == 100) {
+					status.html("Analyzing");
+					percent.addClass("hiddenvis");
+				}
+        		},
+			complete: function(xhr) {
+            			status.html(xhr.responseText);
+				status.removeClass("blinking-div");
+        		}
+		});
+	}); 
 </script>
