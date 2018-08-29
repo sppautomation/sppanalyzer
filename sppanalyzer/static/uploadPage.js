@@ -1,0 +1,74 @@
+$(document).ready(function() {
+	var inputs = document.querySelectorAll( '#file' );
+	Array.prototype.forEach.call( inputs, function( input )
+	{
+		var label = input.nextElementSibling,
+		labelVal = label.innerHTML;
+		input.addEventListener( 'change', function( e )
+		{
+			var fileName = '';
+			if(this.files && this.files.length > 1)
+				fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
+			else
+				fileName = e.target.value.split( '\\' ).pop();
+			if( fileName )
+				label.querySelector( 'span' ).innerHTML = fileName;
+			else
+				label.innerHTML = labelVal;
+		});
+	});
+
+	$("#uploadSubmit").click(function() {
+		$('#uploadForm').submit();
+	});
+
+$(function() {
+	var percent = $('#percent');
+	var status = $('#status');
+	$('#uploadForm').ajaxForm({
+		beforeSend: function() {
+			status.empty();
+			var percentVal = '0%';
+			percent.html(percentVal);
+			status.removeClass("hiddenvis");
+			percent.removeClass("hiddenvis");
+			status.addClass("blinking-div");
+		},
+		uploadProgress: function(event, position, total, percentComplete) {
+			status.html("Uploading")
+			var percentVal = percentComplete + '%';
+			percent.html(percentVal);
+		},
+		complete: function(xhr) {
+			status.html(xhr.responseJSON.status);
+			status.removeClass("blinking-div");
+			percent.addClass("hiddenvis");
+			unpackLogs(xhr.responseJSON.fullfilepath,
+			xhr.responseJSON.filename,
+			xhr.responseJSON.logkey);
+		}
+	});
+});
+});
+function unpackLogs(fullfilepath, filename, logkey) {
+	var status = $('#status');
+	var keyname = $('#keyname');
+	var logkeyinput = $('#logkeyinput');
+	encodedfilepath = encodeURIComponent(fullfilepath)
+	unpackurl = "/unpack?fullfilepath=" + encodedfilepath + "&filename=" + filename + "&logkey=" + logkey
+	$.ajax({
+		type: "POST",
+		url: unpackurl,
+		beforeSend: function() {
+			status.addClass("blinking-div");
+			status.html("Unpacking");
+		},
+		complete: function(xhr) {
+			status.removeClass("blinking-div");
+			status.html(xhr.responseJSON.status);
+			keyname.removeClass("hiddenvis");
+			keyname.html("Log key: " + xhr.responseJSON.logkey);
+			logkeyinput.val(xhr.responseJSON.logkey);
+		}
+	});
+}

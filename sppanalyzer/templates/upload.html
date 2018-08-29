@@ -2,6 +2,7 @@
 <head>
 <script type=text/javascript src="{{url_for('static', filename='jquery-3.3.1.min.js')}}"></script>
 <script type=text/javascript src="{{url_for('static', filename='jquery.form.min.js')}}"></script>
+<script type=text/javascript src="{{url_for('static', filename='uploadPage.js')}}"></script>
 <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='upload.css')}}"/>
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
@@ -9,7 +10,7 @@
 <div id="uploadBody">
 	<h1 class="log-style">SPP Log Analyzer</h1>
 	<div class="upload-form-wrapper">
-		<h2 class="log-style">Upload a system log zip file</h2>
+		<h2 class="log-style">Upload system log</h2>
 		<form id="uploadForm" name="uploadForm" method="post" enctype="multipart/form-data">
 			<input type="file" name="file" id="file" class="inputfile" />
 			<label for="file"><span>Choose File</span></label>
@@ -18,81 +19,15 @@
 			<label id="uploadSubmit" for="uploadbtn">Upload</label>
 		</form>
 		<div class="progress">
-    			<div class="hiddenvis" id="percent">0%</div ></br>
-			<div class="hiddenvis" id="status">STATUS</div >
+    			<div class="hiddenvis" id="percent">0%</div></br>
+			<div class="hiddenvis" id="status">STATUS</div></br>
+			<div class="hiddenvis" id="keyname">LOG KEY: </div>
 		</div>
 	</div>
-</div>
-
-<script>
-	var inputs = document.querySelectorAll( '#file' );
-	Array.prototype.forEach.call( inputs, function( input )
-	{
-		var label	 = input.nextElementSibling,
-			labelVal = label.innerHTML;
 	
-		input.addEventListener( 'change', function( e )
-		{
-			var fileName = '';
-		if(this.files && this.files.length > 1)
-			fileName = ( this.getAttribute( 'data-multiple-caption' ) || '' ).replace( '{count}', this.files.length );
-		else
-			fileName = e.target.value.split( '\\' ).pop();
-
-		if( fileName )
-			label.querySelector( 'span' ).innerHTML = fileName;
-		else
-			label.innerHTML = labelVal;
-		});
-	});
-
-	$( "#uploadSubmit" ).click(function() {
-  		$( "#uploadForm" ).submit();
-	});
-
-	$(function() {
-
-    		var percent = $('#percent');
-    		var status = $('#status');
-
-    		$('#uploadForm').ajaxForm({
-			beforeSend: function() {
-				status.empty();
-				var percentVal = '0%';
-				percent.html(percentVal);
-				status.removeClass("hiddenvis");
-				percent.removeClass("hiddenvis");
-				status.addClass("blinking-div");
-        		},
-			uploadProgress: function(event, position, total, percentComplete) {
-				status.html("Uploading")
-				var percentVal = percentComplete + '%';
-				percent.html(percentVal);
-        		},
-			complete: function(xhr) {
-            			status.html(xhr.responseJSON.status);
-				status.removeClass("blinking-div");
-				percent.addClass("hiddenvis");
-				unpackLogs(xhr.responseJSON.fullfilepath, xhr.responseJSON.filename);
-        		}
-		});
-	}); 
-		
-	function unpackLogs(fullfilepath, filename) {
-                var status = $('#status');
-		encodedfilepath = encodeURIComponent(fullfilepath)
-		unpackurl = "/unpack?fullfilepath=" + encodedfilepath + "&filename=" + filename
-		$.ajax({
-			type: "POST",
-			url: unpackurl,
-			beforeSend: function() {
-				status.addClass("blinking-div");
-				status.html("Unpacking");
-			},
-			complete: function(xhr) {
-				status.removeClass("blinking-div");
-				status.html(xhr.responseJSON.status);
-			}
-		});
-	}
-</script>
+	<div class="upload-form-wrapper">
+		<h2 class="log-style">Analyze Log</h2>
+		<input type="text" id="logkeyinput" placeholder="Enter log key.." /></br>
+		<div class="logviewbutton">Analyze</div>
+	</div>
+</div>

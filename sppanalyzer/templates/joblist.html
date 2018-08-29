@@ -1,0 +1,12 @@
+<!doctype html>
+<head>
+<script type=text/javascript src="{{url_for('static', filename='jquery-3.3.1.min.js')}}"></script>
+<script type=text/javascript src="{{url_for('static', filename='jquery.form.min.js')}}"></script>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
+</head>
+<title>SPP Log Analyzer</title>
+<div id="jobListBody">
+	<h1 class="log-style">Job List</h1>
+	<div id="logkeyholder" data-logkey="{{ logkey }}"></div>
+	<div id="testdiv">{{ logkey }}</div>
+</div>

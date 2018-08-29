@@ -4,10 +4,7 @@ import gzip
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from werkzeug.utils import secure_filename
 
-PROCESSED_FOLDER = '/sppanalyzer/processed'
-
 app = Flask(__name__)
-app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
 
 bp = Blueprint('unpack', __name__, url_prefix='/')
 
@@ -16,6 +13,7 @@ def unpack_log_file():
     try:
         fullfilepath = request.args.get('fullfilepath')
         filename = request.args.get('filename')
+        logkey = request.args.get('logkey')
         #unzip main file to directory with same name
         zip = zipfile.ZipFile(os.path.join(fullfilepath, filename), 'r')
         zip.extractall(fullfilepath)
@@ -40,6 +38,6 @@ def unpack_log_file():
                     zip.extractall(os.path.join(root,newfolder))
                     zip.close()
                     os.remove(os.path.join(root,filename))
-        return jsonify({"status":"unpacked","path":fullfilepath})
+        return jsonify({"status":"unpacked","path":fullfilepath,"logkey":logkey})
     except:
-        return jsonify({"status":"error unpacking"})
+        return jsonify({"status":"error unpacking","logkey":logkey})

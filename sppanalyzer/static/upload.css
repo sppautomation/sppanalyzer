@@ -10,6 +10,7 @@
 	border-radius: 20px;
 	padding-top: 1em;
 	padding-bottom: 1em;
+	margin-top: 1em;
 }
 
 .inputfile {
@@ -32,6 +33,22 @@
 	background-color: lightgray;
 }
 
+.logviewbutton {
+        font-size: 1.25em;
+        font-weight: 700;
+        display: inline-block;
+        cursor: pointer;
+        margin: 1em;
+        border-radius: 5px;
+        padding: 2px;
+        background-color: lightgray;
+}
+
+.logviewbutton:focus,
+.logviewbutton:hover {
+	background-color: darkgray;
+}
+
 .inputfile:focus + label,
 .inputfile + label:hover {
 	background-color: darkgray;
@@ -49,6 +66,10 @@
 body {
 	font-family: courier;
 	text-transform: uppercase;
+}
+
+#logkeyinput {
+	font-family: courier;
 }
 
 #percent {

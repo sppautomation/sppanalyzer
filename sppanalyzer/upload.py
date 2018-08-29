@@ -1,9 +1,11 @@
 import os
+import random
+import string
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = '/sppanalyzer/upload'
 ALLOWED_EXTENSIONS = set(['zip'])
+UPLOAD_FOLDER = '/sppanalyzer'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -26,11 +28,12 @@ def upload_file():
             return jsonify({"status":"Extension not allowed"})
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            fullfilepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            logkey = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(10))
+            fullfilepath = os.path.join(app.config['UPLOAD_FOLDER'], logkey)
             if not os.path.exists(fullfilepath):
                 os.makedirs(fullfilepath)
             file.save(os.path.join(fullfilepath, filename))
-            return jsonify({"status":"Complete","fullfilepath":fullfilepath,"filename":filename})
+            return jsonify({"status":"Complete","fullfilepath":fullfilepath,"filename":filename,"logkey":logkey})
     #for GET return page template
     return render_template('upload.html')
 
