@@ -3,12 +3,8 @@ import csv
 import json
 import subprocess
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
+from flask import current_app as app
 from werkzeug.utils import secure_filename
-
-UPLOAD_FOLDER = '/sppanalyzer'
-
-app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 bp = Blueprint('analyze', __name__, url_prefix='/analyze')
 
@@ -16,7 +12,11 @@ bp = Blueprint('analyze', __name__, url_prefix='/analyze')
 def render_joblist_page():
     # GET requires param of log key for persistence
     logkey = request.args.get('logkey')
-    return render_template('joblist.html', logkey=logkey)
+    keys = os.listdir(app.config['UPLOAD_FOLDER'])
+    if logkey in keys:
+        return render_template('joblist.html', logkey=logkey)
+    else:
+        return jsonify({'status':'error','message':'Log key not found'})
 
 @bp.route('/joboverview', methods=['GET'])
 def get_joboverview():

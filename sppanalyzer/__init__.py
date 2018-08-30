@@ -9,6 +9,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev'
     )
+    app.config.from_pyfile('config.py')
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -26,7 +27,7 @@ def create_app(test_config=None):
     # a simple page
     @app.route('/test')
     def hello():
-        return os.getcwd()
+        return app.config['UPLOAD_FOLDER']
 
     from . import upload
     app.register_blueprint(upload.bp)

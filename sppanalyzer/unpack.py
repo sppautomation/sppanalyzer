@@ -2,9 +2,8 @@ import os
 import zipfile
 import gzip
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
+from flask import current_app as app
 from werkzeug.utils import secure_filename
-
-app = Flask(__name__)
 
 bp = Blueprint('unpack', __name__, url_prefix='/')
 
@@ -38,6 +37,9 @@ def unpack_log_file():
                     zip.extractall(os.path.join(root,newfolder))
                     zip.close()
                     os.remove(os.path.join(root,filename))
-        return jsonify({"status":"unpacked","path":fullfilepath,"logkey":logkey})
+        return jsonify({"status":"UNPACKED","path":fullfilepath,"logkey":logkey})
     except:
-        return jsonify({"status":"error unpacking","logkey":logkey})
+        return jsonify({"status":"ERROR","logkey":logkey})
+
+def unify_virgo_log(fullfilepath):
+    return None
