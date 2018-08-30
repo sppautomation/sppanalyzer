@@ -2,11 +2,18 @@
 <head>
 <script type=text/javascript src="{{url_for('static', filename='jquery-3.3.1.min.js')}}"></script>
 <script type=text/javascript src="{{url_for('static', filename='jquery.form.min.js')}}"></script>
+<script type=text/javascript src="{{url_for('static', filename='joblistPage.js')}}"></script>
+<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='common.css')}}"/>
+<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='joblist.css')}}"/>
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}"/>
 </head>
 <title>SPP Log Analyzer</title>
 <div id="jobListBody">
-	<h1 class="log-style">Job List</h1>
+	<h1 class="log-style">ANALYZE LOGS</h1>
 	<div id="logkeyholder" data-logkey="{{ logkey }}"></div>
-	<div id="testdiv">{{ logkey }}</div>
+	<div class="joblist-wrapper">
+		<h2 class="log-sytle">JOB LIST</h2>
+		<div class="job-list-table-wrapper">
+		</div>
+	</div>
 </div>

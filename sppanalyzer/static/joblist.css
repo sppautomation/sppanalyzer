@@ -1,0 +1,83 @@
+#jobListBody {
+	text-align: center;
+	background-color: white;
+}
+
+.joblist-wrapper {
+	background-color: grey;
+	width: 90%;
+	margin: auto;
+	border-radius: 20px;
+	padding-top: 1em;
+	padding-bottom: 1em;
+	margin-top: 1em;
+}
+
+.joblist-button {
+        font-size: 1.25em;
+        font-weight: 700;
+        display: inline-block;
+        cursor: pointer;
+        margin: 1em;
+        border-radius: 5px;
+        padding: 2px;
+        background-color: lightgray;
+}
+
+.joblist-button:focus,
+.joblist-button:hover {
+	background-color: darkgray;
+}
+
+.inputfile:focus + label,
+.inputfile + label:hover {
+	background-color: darkgray;
+}
+
+.log-style {
+	margin: 1em;
+}
+
+body {
+	font-family: courier;
+}
+
+#jobListTable {
+	text-align: left;
+	width: 100%;
+}
+
+#jobListTableHead {
+	display: block;
+}
+
+#jobListTableBody {
+	display: block;
+	height: 30em;
+	overflow-y: auto;
+	border-radius: 5px;
+	background-color: lightgray;
+}
+
+.hiddenvis {
+	visibility: hidden;
+}
+
+.blinking-div {
+	display: inline-block;
+	animation: blinker 1s linear infinite;
+}
+	
+@keyframes blinker {
+	50% {
+		background-color: darkgrey;
+	}
+}
+
+td, th {
+	padding-right: 20px;
+}
+
+.job-list-table-wrapper {
+	min-height: 20em;
+}

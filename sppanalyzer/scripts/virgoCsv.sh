@@ -18,7 +18,7 @@ if [[ ! -f $1 ]]; then
 fi
 
 # Create a CSV header
-echo "Job ID,Timestamp (epoch),Timestamp (UTC-0000),Job Type,Job Name,Success?"\
+echo "sessionId,epochTime,dateTime,jobType,jobName,jobStatus"\
     > ./virgoLogIndex.csv
 
 # Ensure ./virgoLogIndex.csv can be created.
