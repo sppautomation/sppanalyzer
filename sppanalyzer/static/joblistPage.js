@@ -19,6 +19,10 @@ function getJobList(logkey) {
 }
 
 function renderJobList(jobList) {
+	jobList.sort(function(a,b) {
+		if (a['epochTime'] == b['epochTime']) return 0;
+		return a['epochTime'] < b['epochTime'] ? 1 : -1;
+	});
 	content = '';
 	content += '<table id="jobListTable">';
 	content += '<thead id="jobListTableHead"><tr>';
