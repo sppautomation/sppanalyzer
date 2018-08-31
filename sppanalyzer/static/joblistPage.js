@@ -28,8 +28,29 @@ function getJobSessionInfo(logkey, sessionId) {
 			console.log("something");
 		},
 		complete: function(xhr) {
-			console.log(xhr.responseJSON);
+			renderJobDetails(xhr.responseJSON);
 		}
+	});
+}
+
+function renderJobDetails(jobDetails) {
+	content = '';
+	content += '<div id="jobLogDetailsWrapper">';
+	content += '<div id="backToJoblist" class="joblist-button">BACK</div>';
+	content += '<div id="jobListDetails">';
+	for (var i=0;i<jobDetails.length;i++) {
+		content += '<span>' + jobDetails[i] + '</span></br></br>';
+	}
+	content += '</div></div>';
+
+	$("#sectionTitle").html("JOB DETAILS");
+	$('#jobListTable').hide();
+	$(".job-list-table-wrapper").append(content);
+
+	$("#backToJoblist").click(function() {
+		$("#jobLogDetailsWrapper").remove();
+		$('#jobListTable').show();
+		$("#sectionTitle").html("JOB LIST");
 	});
 }
 

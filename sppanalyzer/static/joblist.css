@@ -3,6 +3,17 @@
 	background-color: white;
 }
 
+#jobListDetails {
+	text-align: left;
+	font-size: .75em;
+	height: 35em;
+	overflow-y: auto;
+}
+
+#jobLogDetailsWrapper {
+	text-align: left;
+}
+
 .joblist-wrapper {
 	background-color: grey;
 	width: 90%;
