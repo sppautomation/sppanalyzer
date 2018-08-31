@@ -30,11 +30,8 @@ def get_job_details():
     logkey = request.args.get('logkey')
     jobsession = request.args.get('jobsession')
     logdir = app.config['UPLOAD_FOLDER'] + "/" + logkey
-    # Requires param of log key and job session ID
-    # function determines if analyze datafile needs to be generated
-    # if so: runs script with proper args to generate
-    # returns JSON of job details, errors, etc.
-    return None
+    jsondata = get_jobdetails_data(logdir, jobsession)
+    return jsondata
 
 def get_log_fullpath(logdir):
     # Need to find better way here or ensure only one directory exists in logdir
@@ -51,8 +48,13 @@ def get_joboverview_data(logdir):
     csvfile = logdir + '/virgoLogIndex.csv'
     return csv_to_json(csvfile)
 
-def get_jobdetails_data(logdir):
-    return None
+def get_jobdetails_data(logdir, jobsession):
+    logfullpath = get_log_fullpath(logdir)
+    out, err = subprocess.Popen([os.getcwd() + "/sppanalyzer/scripts/virgoLogExtractor.sh",
+                                logfullpath + "/virgo/log.log", jobsession],
+                                stdout=subprocess.PIPE).communicate()
+    loglines = out.decode("utf-8").split("\n")
+    return jsonify(loglines)
 
 def csv_to_json(csvfile):
     with open(csvfile) as f:

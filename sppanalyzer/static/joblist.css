@@ -29,6 +29,16 @@
 	background-color: darkgray;
 }
 
+.jobSessionId {
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.jobSessionId:focus,
+.jobSessionId:hover {
+	background-color: darkgray;
+}
+
 .inputfile:focus + label,
 .inputfile + label:hover {
 	background-color: darkgray;

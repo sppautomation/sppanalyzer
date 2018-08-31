@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	var logkey = $("#logkeyholder").data("logkey");
 	getJobList(logkey);
+
 });
 
 function getJobList(logkey) {
@@ -14,6 +15,20 @@ function getJobList(logkey) {
 		complete: function(xhr) {
 			$(".job-list-table-wrapper").removeClass('loading-overlay');
 			renderJobList(xhr.responseJSON);
+		}
+	});
+}
+
+function getJobSessionInfo(logkey, sessionId) {
+	jobdetailsurl = "/analyze/jobdetails?logkey=" + logkey + "&jobsession=" + sessionId
+	$.ajax({
+		type: "GET",
+		url: jobdetailsurl,
+		beforeSend: function() {
+			console.log("something");
+		},
+		complete: function(xhr) {
+			console.log(xhr.responseJSON);
 		}
 	});
 }
@@ -38,7 +53,7 @@ function renderJobList(jobList) {
 		var jobTime = new Date(parseInt(job['epochTime'])*1000);
 		var tableDateTime = jobTime.toLocaleDateString() + " " + jobTime.toLocaleTimeString();
 		content += '<tr>';
-		content += '<td id="jobSessionId">' + job['sessionId'] + '</td>';
+		content += '<td><div class="jobSessionId">' + job['sessionId'] + '</div></td>';
 		content += '<td>' + job['jobName'] + '</td>';
 		content += '<td>' + tableDateTime + '</td>';
 		content += '<td>' + job['jobStatus'] + '</td>';
@@ -50,6 +65,10 @@ function renderJobList(jobList) {
 
 	$(".job-list-table-wrapper").append(content);
 	adjustBlockTableWidth(4, "#jobListTable");
+
+	$(".jobSessionId").click(function() {
+		getJobSessionInfo($("#logkeyholder").data("logkey"), $(this).html());
+	});
 }
 
 function adjustBlockTableWidth(numCols, tableSelector) {
@@ -65,3 +84,4 @@ function adjustBlockTableWidth(numCols, tableSelector) {
 		}
 	}
 }
+
