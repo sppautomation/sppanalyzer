@@ -8,6 +8,7 @@
 	font-size: .75em;
 	height: 35em;
 	overflow-y: auto;
+	background-color: lightgray;
 }
 
 #jobLogDetailsWrapper {
@@ -100,5 +101,5 @@ td, th {
 }
 
 .job-list-table-wrapper {
-	min-height: 20em;
+	min-height: 30em;
 }

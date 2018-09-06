@@ -10,7 +10,8 @@ bp = Blueprint('analyze', __name__, url_prefix='/analyze')
 
 @bp.route('/joblist', methods=['GET'])
 def render_joblist_page():
-    # GET requires param of log key for persistence
+    # GET requires param of logkey for persistence
+    # requires virgolog which can be multiple params
     logkey = request.args.get('logkey')
     keys = os.listdir(app.config['UPLOAD_FOLDER'])
     if logkey in keys:
@@ -21,6 +22,7 @@ def render_joblist_page():
 @bp.route('/joboverview', methods=['GET'])
 def get_joboverview():
     logkey = request.args.get('logkey')
+    virgologs = request.args.getlist('virgolog')
     logdir = app.config['UPLOAD_FOLDER'] + "/" + logkey
     jsondata = get_joboverview_data(logdir)
     return jsondata
@@ -38,6 +40,14 @@ def get_log_fullpath(logdir):
     for name in os.listdir(logdir):
         if os.path.isdir(os.path.join(logdir,name)):
             return os.path.join(logdir,name)
+
+def virgo_log_exists(virgolog, logdir):
+    logfullpath = get_log_fullpath(logdir)
+    virgologlist = os.listdir(logfullpath + "/virgo")
+    if virgolog in virgologlist:
+        return True
+    else:
+        return False
 
 def get_joboverview_data(logdir):
     logfullpath = get_log_fullpath(logdir)

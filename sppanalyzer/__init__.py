@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, request
 
 
 def create_app(test_config=None):
@@ -27,7 +27,7 @@ def create_app(test_config=None):
     # a simple page
     @app.route('/test')
     def hello():
-        return app.config['UPLOAD_FOLDER']
+        return "This is a test"
 
     from . import upload
     app.register_blueprint(upload.bp)

@@ -7,9 +7,24 @@
 	content: '';
 	position:absolute;
 	top: 0; right: 0; bottom: 0; left: 0;
-	background-size: contain;
+	background-size: 150px;
 	background-image: url(spinner.svg);
 	background-repeat: no-repeat;
 	background-position: center center;
 }
 
+::-webkit-scrollbar {
+	width: 10px;
+}
+
+::-webkit-scrollbar-track {
+	background: #f1f1f1; 
+}
+ 
+::-webkit-scrollbar-thumb {
+	background: #888; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #555; 
+}
