@@ -2,7 +2,7 @@ import os
 
 from flask import Flask, request
 
-app = Flask(__name__, instance_relative_config=True)
+app = Flask(__name__)
 
 app.config.from_pyfile('config.py')
 
