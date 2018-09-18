@@ -8,14 +8,14 @@
 # Usage: 
 # $ bash ./longJob.sh <FILE> <JOBID/ALL> <THRESHOLD (default: 30)>
 #
-# <FILE> ... a virgo log.log file.  To use GZ arhived log files, extract (and 
+# <FILE> ... a virgo log.log file.  To use GZ archived log files, extract (and 
 # concatenate) them first.
 # <JOBID/ALL> ... Use either a job session ID or "ALL" to use all the job IDs 
-# appeared in the log file. Using the opton "ALL" may take over an hour to 
+# appeared in the log file. Using the option "ALL" may take over an hour to 
 # complete.
 # <THRESHOLD> ... Specify a threshold in second and the script only returns
 # a list of job record that took longer than that period of time.
-# Defualt: 30 (seconds).
+# Default: 30 (seconds).
 #
 # Example:
 # $ bash ./longJob.sh ./virgo/log.log 1535346000093 20
