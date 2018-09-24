@@ -4,13 +4,11 @@ import string
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
-import logging
 
 ALLOWED_EXTENSIONS = set(['zip'])
 
 bp = Blueprint('upload', __name__, url_prefix='/')
 
-logger = logging.getLogger("upload")
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -18,13 +16,10 @@ def allowed_file(filename):
 
 @bp.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-    logger.info("made it here")
     if request.method == 'POST':
         if 'file' not in request.files:
-            logger.info("There's no file!")
             return jsonify({"status":"No file selected"})
         file = request.files['file']
-        logger.info("file exists")
         if file.filename == '':
             return jsonify({"status":"No file selected"})
         if file and not allowed_file(file.filename):
