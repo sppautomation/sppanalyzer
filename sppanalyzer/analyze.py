@@ -5,13 +5,17 @@ import subprocess
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
+import logging
 
 bp = Blueprint('analyze', __name__, url_prefix='/analyze')
+
+logger = logging.getLogger("analyze")
 
 @bp.route('/joblist', methods=['GET'])
 def render_joblist_page():
     # GET requires param of logkey for persistence
     # requires virgolog which can be multiple params
+    logging.info("Rendering joblist page")
     logkey = request.args.get('logkey')
     keys = os.listdir(app.config['UPLOAD_FOLDER'])
     if logkey in keys:
@@ -21,6 +25,7 @@ def render_joblist_page():
 
 @bp.route('/joboverview', methods=['GET'])
 def get_joboverview():
+    logging.info("Getting job overview")
     logkey = request.args.get('logkey')
     virgologs = request.args.getlist('virgolog')
     logdir = app.config['UPLOAD_FOLDER'] + "/" + logkey
@@ -29,6 +34,7 @@ def get_joboverview():
 
 @bp.route('/jobdetails', methods=['GET'])
 def get_job_details():
+    logger.info("Getting job details")
     logkey = request.args.get('logkey')
     jobsession = request.args.get('jobsession')
     logdir = app.config['UPLOAD_FOLDER'] + "/" + logkey
