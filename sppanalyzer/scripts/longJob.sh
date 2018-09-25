@@ -1,5 +1,6 @@
 #!/bin/bash
-# Version 0.1. Tue Sep 18 05:51:48 DST 2018
+# Version 0.3. Tue Sep 25 05:03:23 DST 2018
+# IBM Spectrum Protect Plus 10.2, 10.1
 # 
 # Returns a list of job records in the virgo log.log of IBM Spectrum Protect 
 # Plus. Specify the threshold in second(s) and it only returns the job 
@@ -56,33 +57,33 @@ else
     exit 1
 fi
 
-LN_TSTAMP=$(grep -n "^\[....-..-.. ..:..:......\] .\{100\} $JOBID " $FILE \
-    | cut -d '.' -f 1 | sed "s/:\[/,/g")
+LN_TSTAMP=$(grep -n \
+    "^\[20..-..-..[ T]..:..:..\..\{3,4\}] .\{99,100\}  $JOBID " $FILE)
 
-ETSTAMP=$(echo "$LN_TSTAMP" | cut -d ',' -f 2 \
-    | while read timestamp
+LN_ESTAMP=$(echo "$LN_TSTAMP" | while read line
 do
-    date -d "$timestamp" +%s
+    awk -F '[][]|:|-|T| |Z' '{\
+        estamp = $8 + $7 * 60 + $6 * 60 * 60 + $5 * 60 * 60 * 24 \
+        + $4 * 60 * 60 * 24 * 30 + $3 * 60 * 60 * 24 * 30 * 12
+    printf ("%d,%f\n", $1, estamp) }'
 done)
 
-LN_TSTAMP_ETSTAMP=$(\
-    paste <(echo "$LN_TSTAMP") <(echo "$ETSTAMP") -d ',')
+LN_ESTAMP_PAIR=$(paste -d ',' \
+    <(echo "$LN_ESTAMP" | head -n -1) <(echo "$LN_ESTAMP" | tail -n +2))
 
-LN_TSTAMP_ETSTAMP_PAIR=$(paste -d ',' \
-    <(echo "$LN_TSTAMP_ETSTAMP" | head -n -1) \
-    <(echo "$LN_TSTAMP_ETSTAMP" | tail -n +2))
-
-echo "$LN_TSTAMP_ETSTAMP_PAIR" | while read line
+echo "$LN_ESTAMP_PAIR" | while read line
 do
-    line1=$(echo $line | cut -d ',' -f 1)
-    etstamp1=$(echo $line | cut -d ',' -f 3)
-    line2=$(echo $line | cut -d ',' -f 4)
-    etstamp2=$(echo $line | cut -d ',' -f 6)
-    if [[ $((${etstamp2}-${etstamp1})) -gt $THRESHOLD ]]; then
-        echo "----- $((${etstamp2}-${etstamp1})) -----"
-        bash ./multilineJobRecordPrinter.sh $FILE "$line1"
-        bash ./multilineJobRecordPrinter.sh $FILE "$line2"
-    fi
+    read -r line1 line2 diff \
+        <<<$(echo "$line" | awk -F ',' -v threshold="$THRESHOLD" '{\
+        line1 = $1; estamp1 = $2; line2 = $3; estamp2 = $4
+    diff = estamp2 - estamp1
+    if( diff > threshold ) {print line1" "line2" "diff}}')
+
+        if [ ! -z $diff ]; then
+            echo "----- $diff seconds - lines $line1 $line2 -----"
+            bash ./multilineJobRecordPrinter.sh $FILE "$line1"
+            bash ./multilineJobRecordPrinter.sh $FILE "$line2"
+        fi
 done
 
 exit $?
