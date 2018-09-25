@@ -1,6 +1,7 @@
 #!/bin/bash
-# Version 0.2. Mon Aug 27 08:14:00 DST 2018
+# Version 0.3. Tue Sep 25 01:46:08 DST 2018
 # 
+# IBM Spectrum Protect Plus 10.1.1 10.1.2 
 # Returns all the records associated with a given job ID.
 # 
 # Usage: 
@@ -16,24 +17,25 @@
 # 1: INFO  2: WARN  4: ERROR  (Default: 7: ALL)
 # Use a sum of these values to select multiple items (e.g. 6: WARN and ERROR).
 
-if [[ ! -f $1 ]]; then
-    echo "Could not find the file $1. Aborting."
+if [ -f $1 ]; then
+    FILE=$1
+else
+    echo "$1 is not a vailid file."
     exit 1
 fi
 
-JOBID_SYNTAX="[0-9]{13}"
-if [[ $2 =~ $JOBID_SYNTAX ]]; then
-    RECORDS_ALL_HEAD=$(grep -n \
-        "\[20..-..-.. ..:..:......\] .*[^0-9a-zA-Z]$2[^0-9a-zA-Z]" $1)
-elif [[ $2 == "ALL" ]]; then
-    RECORDS_ALL_HEAD=$(grep -n "\[20..-..-.. ..:..:......\] .* "   $1)
-elif [[ $2 == "OTHERS" ]]; then
-    RECORDS_ALL_HEAD=$(grep -n "\[20..-..-.. ..:..:......\] .* "   $1 \
-        | grep -v " [0-9]\{13\} ")
+if [[ "$2" =~ [0-9]{13} ]]; then
+    JOBID=$2
+elif [ "$2" == "OTHERS"  ]; then
+    JOBID=""
+elif [ "$2" == "ALL"     ]; then
+    JOBIDS=$(cut -c 128-140 $FILE | grep -o "[0-9]\{13\}" | sort -u)
+    echo "$JOBIDS" | while read jobid
+    do 
+        bash ./virgoLogExtractor.sh $FILE $jobid
+    done
 else
-    echo "Invalid job ID was given. Please enter a valid 13-digit job ID, \
-\"ALL\" to select the whole part of the records, or \"OTHERS\" to select \
-all the records that do not have any job ID. Aborting."
+    echo "Invalid argument."
     exit 1
 fi
 
@@ -52,31 +54,37 @@ else
     exit 1
 fi
 
-RECORDS_INFO=$(\
+LNS_INFO=$(
 if [[ "$MODE" == "1" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "5" ]]\
-    || [[ "$MODE" == "7" ]] && echo "$RECORDS_ALL_HEAD" | grep -q " INFO "
+    || [[ "$MODE" == "7" ]]
 then
-    echo "$RECORDS_ALL_HEAD" | grep " INFO "
-#    echo "FOOO\n"
+    grep -n "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] INFO  .\{93,94\}  $JOBID " \
+       $FILE | cut -d ':' -f 1
 fi)
 
-RECORDS_WARN=$(\
+LNS_WARN=$(
 if [[ "$MODE" == "2" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "6" ]]\
-    || [[ "$MODE" == "7" ]] && echo "$RECORDS_ALL_HEAD" | grep -q " WARN "
+    || [[ "$MODE" == "7" ]]
 then
-    echo "$RECORDS_ALL_HEAD" | grep " WARN "
-#    echo "BAAA\n"
+    grep -n "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] WARN  .\{93,94\}  $JOBID " \
+       $FILE | cut -d ':' -f 1
 fi)
 
-RECORDS_ERROR=$(\
+LNS_ERROR=$(
 if [[ "$MODE" == "4" ]] || [[ "$MODE" == "5" ]] || [[ "$MODE" == "6" ]]\
-    || [[ "$MODE" == "7" ]] && echo "$RECORDS_ALL_HEAD" | grep -q " ERROR "
+    || [[ "$MODE" == "7" ]]
 then
-    echo "$RECORDS_ALL_HEAD" | grep " ERROR "
+    grep -n "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] ERROR .\{93,94\}  $JOBID " \
+       $FILE | cut -d ':' -f 1
 fi)
 
-RECORDS_ALL="${RECORDS_INFO}${RECORDS_WARN}${RECORDS_ERROR}"
-echo -e "$RECORDS_ALL" | sed 's/^\n//g' | sort -t ':' -k 1 | cut -d ':' -f 2-
+LNS_ALL=$(echo -e "${LNS_INFO}\n${LNS_WARN}\n${LNS_ERROR}" \
+    | grep "^[0-9]\+$" | sort)
+
+echo "$LNS_ALL" | while read ln
+do
+    bash ./multilineJobRecordPrinter.sh $FILE $ln
+done
 
 exit $?
 
