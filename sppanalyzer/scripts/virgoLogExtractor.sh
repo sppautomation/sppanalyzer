@@ -54,37 +54,37 @@ else
     exit 1
 fi
 
+RECORDS=$(\
+    grep -no "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] ..... .\{93,94\}  $JOBID " \
+    $FILE)
+
 LNS_INFO=$(
 if [[ "$MODE" == "1" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "5" ]]\
     || [[ "$MODE" == "7" ]]
 then
-    grep -n "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] INFO  .\{93,94\}  $JOBID " \
-       $FILE | cut -d ':' -f 1
+    echo "$RECORDS" | grep " INFO  " | cut -d ':' -f 1
 fi)
 
 LNS_WARN=$(
 if [[ "$MODE" == "2" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "6" ]]\
     || [[ "$MODE" == "7" ]]
 then
-    grep -n "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] WARN  .\{93,94\}  $JOBID " \
-       $FILE | cut -d ':' -f 1
+    echo "$RECORDS" | grep " WARN  " | cut -d ':' -f 1
 fi)
 
 LNS_ERROR=$(
 if [[ "$MODE" == "4" ]] || [[ "$MODE" == "5" ]] || [[ "$MODE" == "6" ]]\
     || [[ "$MODE" == "7" ]]
 then
-    grep -n "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] ERROR .\{93,94\}  $JOBID " \
-       $FILE | cut -d ':' -f 1
+    echo "$RECORDS" | grep " ERROR " | cut -d ':' -f 1
 fi)
 
-LNS_ALL=$(echo -e "${LNS_INFO}\n${LNS_WARN}\n${LNS_ERROR}" \
-    | grep "^[0-9]\+$" | sort)
+echo -e "${LNS_INFO}\n${LNS_WARN}\n${LNS_ERROR}" | sed '/^$/d' | sort \
+    > ./ln${JOBID}_${MODE}.tmp
 
-echo "$LNS_ALL" | while read ln
-do
-    bash ./multilineJobRecordPrinter.sh $FILE $ln
-done
+awk -f ./multilineJobRecordPrinter.awk ./ln${JOBID}_${MODE}.tmp $FILE
+
+rm ./ln${JOBID}_${MODE}.tmp
 
 exit $?
 
