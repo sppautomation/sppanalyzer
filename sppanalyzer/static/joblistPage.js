@@ -1,7 +1,9 @@
 $(document).ready(function() {
 	var logkey = $("#logkeyholder").data("logkey");
 	getJobList(logkey);
-
+	$("#backToUpload").click(function() {
+                window.location.href = '/upload';
+        });
 });
 
 function getJobList(logkey) {
@@ -25,7 +27,6 @@ function getJobSessionInfo(logkey, sessionId) {
 		type: "GET",
 		url: jobdetailsurl,
 		beforeSend: function() {
-			console.log("something");
 		},
 		complete: function(xhr) {
 			renderJobDetails(xhr.responseJSON);
@@ -39,17 +40,25 @@ function renderJobDetails(jobDetails) {
 	content += '<div id="backToJoblist" class="joblist-button">BACK</div>';
 	content += '<div id="jobListDetails">';
 	for (var i=0;i<jobDetails.length;i++) {
-		content += '<span>' + jobDetails[i] + '</span></br></br>';
+		if(jobDetails[i].includes("] ERROR"))
+			content += '<span style="background-color:red;">';
+		else if(jobDetails[i].includes("] WARN"))
+			content += '<span style="background-color:yellow;">';
+		else
+			content += '<span>';
+		content += jobDetails[i] + '</span></br></br>';
 	}
 	content += '</div></div>';
 
 	$("#sectionTitle").html("JOB DETAILS");
 	$('#jobListTable').hide();
+	$('#backToUpload').hide();
 	$(".job-list-table-wrapper").append(content);
 
 	$("#backToJoblist").click(function() {
 		$("#jobLogDetailsWrapper").remove();
 		$('#jobListTable').show();
+		$('#backToUpload').show();
 		$("#sectionTitle").html("JOB LIST");
 	});
 }
@@ -73,7 +82,12 @@ function renderJobList(jobList) {
 		var job = jobList[i];
 		var jobTime = new Date(parseInt(job['epochTime'])*1000);
 		var tableDateTime = jobTime.toLocaleDateString() + " " + jobTime.toLocaleTimeString();
-		content += '<tr>';
+		if(job['jobStatus'].toUpperCase() != "COMPLETED" && job['jobStatus'].toUpperCase() != "FAILED")
+			content += '<tr style="background-color:yellow;">';
+		else if(job['jobStatus'].toUpperCase() == "FAILED")
+			content += '<tr style="background-color:red;">';
+		else
+			content += '<tr>';
 		content += '<td><div class="jobSessionId">' + job['sessionId'] + '</div></td>';
 		content += '<td>' + job['jobName'] + '</td>';
 		content += '<td>' + tableDateTime + '</td>';

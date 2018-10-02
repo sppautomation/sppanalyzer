@@ -67,6 +67,7 @@ body {
 #jobListTable {
 	text-align: left;
 	width: 100%;
+	border-collapse: collapse;
 }
 
 #jobListTableHead {
@@ -102,4 +103,5 @@ td, th {
 
 .job-list-table-wrapper {
 	min-height: 30em;
+	text-align: left;
 }
