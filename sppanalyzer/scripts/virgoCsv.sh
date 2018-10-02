@@ -38,7 +38,7 @@ $FILE | cut -d ' ' -f 1,7-)
 JOBIDS=$(echo "$JOBHEADERS" | cut -c 1-13)
 # echo "$JOBIDS"
 
-JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d '.,')
+JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d ',')
 
 JOBNAMES=$(echo "$JOBHEADERS" | cut -c 15- | rev | cut -d ' ' -f 12- | rev)
 # echo "$JOBNAMES"
@@ -69,11 +69,11 @@ done)
 JOBTYPES=$(echo "$SLANAMES" | cut -d '|' -f 1)
 SLANAMES=$(echo "$SLANAMES" | cut -d '|' -f 2- | tr -d ',')
 
-RESULT_RECORDS=$(grep -o "completed.*with status .* id [0-9]\{13\}" $FILE)
+RESULT_RECORDS=$(grep -o "[0-9]\{13\} .* completed.*with status .*" $FILE | tac)
 RESULT=$(echo "$JOBIDS" | while read jobid
 do
     result=$(echo "$RESULT_RECORDS" | grep "$jobid" \
-        | grep -m 1 -o "\(COMPLETED\|PARTIAL\|FAILED\|RESOURCE ACTIVE\)")
+        | grep -o -m 1 "\(COMPLETED\|PARTIAL\|FAILED\|RESOURCE ACTIVE\)")
     if [[ -z $result ]]; then
         echo "UNKNOWN"
     else
