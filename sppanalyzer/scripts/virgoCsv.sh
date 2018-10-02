@@ -21,7 +21,7 @@ else
 fi
 
 # Create a CSV header
-echo "Job ID,Start Date,Job Type,SLA Name,Success?,Target(s)"\
+echo "JobID,StartDateTime,JobType,SLA,Result,Targets"\
     > ./virgoLogIndex.csv
 
 # Ensure ./virgoLogIndex.csv can be created.
@@ -36,7 +36,7 @@ $FILE | cut -d ' ' -f 1,7-)
 
 JOBIDS=$(echo "$JOBHEADERS" | cut -c 1-13)
 
-JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d '.,')
+# JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d '.,')
 
 JOBID_VMS_RAW=$(grep -o "  [0-9]\{13\} vmWrapper .* type vm $" $FILE | rev \
     | cut -d ' ' -f 4- | rev | cut -d ' ' -f 3,5-)
@@ -89,7 +89,8 @@ do
     elif [[ $line =~ " db2_"             ]]; then
         jobdetails_printer "$line" "$JOBID_APPS" "Application - DB2"
     else
-        echo "IBM Spectrum Protect Plus|$line"
+        slaname=$(echo "$line" | sed "s/^[0-9]\{13\} //g")
+        echo "IBM Spectrum Protect Plus|$slaname"
     fi
 done)
 
@@ -111,12 +112,13 @@ done)
 
 paste -d ',' \
     <(echo "$JOBIDS") \
-    <(echo "$JOBTS") \
+    <(echo "$JOBIDS" | cut -c 1-10) \
     <(echo "$JOBTYPES") \
     <(echo "$SLANAMES")\
     <(echo "$RESULT")\
     <(echo "$TARGETS")\
     >> ./virgoLogIndex.csv
 
+#    <(echo "$JOBTS") \
 exit $?
 
