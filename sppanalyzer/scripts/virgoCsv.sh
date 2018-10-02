@@ -38,7 +38,7 @@ $FILE | cut -d ' ' -f 1,7-)
 JOBIDS=$(echo "$JOBHEADERS" | cut -c 1-13)
 # echo "$JOBIDS"
 
-JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d ',')
+JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d '.,')
 
 JOBNAMES=$(echo "$JOBHEADERS" | cut -c 15- | rev | cut -d ' ' -f 12- | rev)
 # echo "$JOBNAMES"
