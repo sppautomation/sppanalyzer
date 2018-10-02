@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 0.4. Tue Oct  2 10:27:03 DST 2018
+# Version 0.5. Tue Oct  2 11:20:43 DST 2018
 # 
 # IBM Spectrum Protect Plus 10.1.1 10.1.2 
 # Creates a job index as a CSV file ./virgoLogIndex.csv .
@@ -33,19 +33,15 @@ fi
 
 JOBHEADERS=$(grep -o "[0-9]\{13\} ===== Starting job for policy .*\.  id " \
 $FILE | cut -d ' ' -f 1,7-)
-# echo "$JOBHEADERS"
 
 JOBIDS=$(echo "$JOBHEADERS" | cut -c 1-13)
-# echo "$JOBIDS"
 
 JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d '.,')
 
 JOBID_VMS_RAW=$(grep -o "  [0-9]\{13\} vmWrapper .* type vm $" $FILE | rev \
     | cut -d ' ' -f 4- | rev | cut -d ' ' -f 3,5-)
-# echo "$JOBID_VMS_RAW"
 JOBID_APPS_RAW=$(grep -o "  [0-9]\{13\} Options for database [^:]*" $FILE \
     | cut -d ' ' -f 3,7- )
-# echo "$JOBID_APPS_RAW"
 
 jobid_items_unifier () {
     jobid_item=$1
@@ -90,8 +86,8 @@ do
         jobdetails_printer "$line" "$JOBID_APPS" "Application - Oracle"
     elif [[ $line =~ " sql_"             ]]; then
         jobdetails_printer "$line" "$JOBID_APPS" "Application - SQL"
-#   elif [[ $line =~ " db2"             ]]; then
-#       jobdetails_printer "$line" "$JOBID_APPS" "Application - DB2"
+    elif [[ $line =~ " db2_"             ]]; then
+        jobdetails_printer "$line" "$JOBID_APPS" "Application - DB2"
     else
         echo "IBM Spectrum Protect Plus|$line"
     fi
