@@ -1,10 +1,10 @@
 #!/bin/bash
-# Version 0.1. Sun Aug 26 09:16:55 DST 2018
+# Version 0.2. Tue Oct  2 02:38:44 DST 2018
 
 if [[ $1 = '-v' || $1 = '--version' ]]; then
    echo -e "Log Analyzer for IBM Spectrum Protection Plus\n\
 --------------------------------------------------------\n\
-Version 0.1. 2018-08-20.\n\n"
+Version 0.2 2018-10-02.\n\n"
    exit 0
 fi
 
@@ -18,7 +18,7 @@ if [[ $1 = '-h' || $1 = '--help' ]]; then
     exit 0
 fi
 
-DIRNAME="sppAnalyer$(env TZ=UTC date +%F_%H%M)utc"
+DIRNAME="sppAnalyzer$(env TZ=UTC date +%F_%H%M)utc"
 
 echo "Creating a new directory $DIRNAME ."
 
