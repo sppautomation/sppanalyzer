@@ -1,5 +1,5 @@
 #!/bin/bash
-# Version 0.3. Tue Oct  2 06:41:42 DST 2018
+# Version 0.4. Tue Oct  2 10:27:03 DST 2018
 # 
 # IBM Spectrum Protect Plus 10.1.1 10.1.2 
 # Creates a job index as a CSV file ./virgoLogIndex.csv .
@@ -21,7 +21,7 @@ else
 fi
 
 # Create a CSV header
-echo "Job ID,Start Date,Job Type,SLA Name,Success?"\
+echo "Job ID,Start Date,Job Type,SLA Name,Success?,Target(s)"\
     > ./virgoLogIndex.csv
 
 # Ensure ./virgoLogIndex.csv can be created.
@@ -38,36 +38,68 @@ $FILE | cut -d ' ' -f 1,7-)
 JOBIDS=$(echo "$JOBHEADERS" | cut -c 1-13)
 # echo "$JOBIDS"
 
-JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d ',')
+JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d '.,')
 
-JOBNAMES=$(echo "$JOBHEADERS" | cut -c 15- | rev | cut -d ' ' -f 12- | rev)
-# echo "$JOBNAMES"
+JOBID_VMS_RAW=$(grep -o "  [0-9]\{13\} vmWrapper .* type vm $" $FILE | rev \
+    | cut -d ' ' -f 4- | rev | cut -d ' ' -f 3,5-)
+# echo "$JOBID_VMS_RAW"
+JOBID_APPS_RAW=$(grep -o "  [0-9]\{13\} Options for database [^:]*" $FILE \
+    | cut -d ' ' -f 3,7- )
+# echo "$JOBID_APPS_RAW"
 
-SLANAMES=$(echo "$JOBNAMES" | while read line
+jobid_items_unifier () {
+    jobid_item=$1
+
+    echo "$jobid_item" | cut -d ' ' -f 1 | sort -u | while read jobid
 do
-    if   [[ $line =~ ^catalog         ]]; then
+    items=$(echo "$jobid_item" | grep "^$jobid " | cut -d ' ' -f 2- \
+        | tr '\n' ':' | sed "s/:$/\n/g")
+    echo "$jobid $items"
+done
+}
+
+JOBID_VMS=$( jobid_items_unifier "$JOBID_VMS_RAW")
+JOBID_APPS=$(jobid_items_unifier "$JOBID_APPS_RAW")
+
+JOBNAMES=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 12- | rev)
+
+jobdetails_printer () {
+    jobnames_line=$1
+    job_item_list=$2
+    job_type=$3
+    
+    jobid=$(cut -d ' ' -f 1 <<< $jobnames_line)
+    items=$(echo "$job_item_list" | grep -m 1 "$jobid" | cut -d ' ' -f 2-)
+    slaname=$(cut -d '_' -f 2- <<< $line)
+    echo "$job_type|$slaname|$items"
+}
+    
+JOBDETAILS=$(echo "$JOBNAMES" | while read line
+do
+    if   [[ $line =~ " catalog"         ]]; then
         echo "IBM Spectrum Protect Plus|Catalog"
-    elif [[ $line =~ ^onDemandRestore ]]; then
+    elif [[ $line =~ " onDemandRestore" ]]; then
         echo "IBM Spectrum Protect Plus|On-Demand Restore"
-    elif [[ $line =~ ^Maintenance     ]]; then
+    elif [[ $line =~ " Maintenance"     ]]; then
         echo "IBM Spectrum Protect Plus|Maintenance"
-    elif [[ $line =~ ^vmware          ]]; then
-        echo "Hypervisor - VMware|$( cut -d '_' -f 2- <<< $line)"
-    elif [[ $line =~ ^hyperv          ]]; then
-        echo "Hypervisor - Hyper-V|$(cut -d '_' -f 2- <<< $line)"
-    elif [[ $line =~ ^oracle          ]]; then
-        echo "Application - Oracle|$(cut -d '_' -f 2- <<< $line)"
-    elif [[ $line =~ ^sql             ]]; then
-        echo "Application - SQL|$(   cut -d '_' -f 2- <<< $line)"
-#   elif [[ $line =~ ^db2             ]]; then
-#       echo "Application - Db2|$(   cut -d '_' -f 2- <<< $line)"
+    elif [[ $line =~ " vmware_"          ]]; then
+        jobdetails_printer "$line" "$JOBID_VMS"  "Hypervisor - VMware"
+    elif [[ $line =~ " hyperv_"          ]]; then
+        jobdetails_printer "$line" "$JOBID_VMS"  "Hypervisor - Hyper-V"
+    elif [[ $line =~ " oracle_"          ]]; then
+        jobdetails_printer "$line" "$JOBID_APPS" "Application - Oracle"
+    elif [[ $line =~ " sql_"             ]]; then
+        jobdetails_printer "$line" "$JOBID_APPS" "Application - SQL"
+#   elif [[ $line =~ " db2"             ]]; then
+#       jobdetails_printer "$line" "$JOBID_APPS" "Application - DB2"
     else
         echo "IBM Spectrum Protect Plus|$line"
     fi
 done)
 
-JOBTYPES=$(echo "$SLANAMES" | cut -d '|' -f 1)
-SLANAMES=$(echo "$SLANAMES" | cut -d '|' -f 2- | tr -d ',')
+JOBTYPES=$(echo "$JOBDETAILS" | cut -d '|' -f 1)
+SLANAMES=$(echo "$JOBDETAILS" | cut -d '|' -f 2 | tr -d ',')
+TARGETS=$( echo "$JOBDETAILS" | cut -d '|' -f 3 | tr -d ',')
 
 RESULT_RECORDS=$(grep -o "[0-9]\{13\} .* completed.*with status .*" $FILE | tac)
 RESULT=$(echo "$JOBIDS" | while read jobid
@@ -87,6 +119,7 @@ paste -d ',' \
     <(echo "$JOBTYPES") \
     <(echo "$SLANAMES")\
     <(echo "$RESULT")\
+    <(echo "$TARGETS")\
     >> ./virgoLogIndex.csv
 
 exit $?
