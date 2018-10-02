@@ -4,7 +4,8 @@
 if [[ $1 = '-v' || $1 = '--version' ]]; then
    echo -e "Log Analyzer for IBM Spectrum Protection Plus\n\
 --------------------------------------------------------\n\
-Version 0.2 2018-10-02.\n\n"
+Version 0.2 2018-10-02.\n
+Supported versions: 10.1.2, 10.1.1\n\n"
    exit 0
 fi
 
