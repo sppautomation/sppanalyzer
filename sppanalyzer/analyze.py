@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 
 bp = Blueprint('analyze', __name__, url_prefix='/analyze')
 
+
 @bp.route('/joblist', methods=['GET'])
 def render_joblist_page():
     # GET requires param of logkey for persistence

@@ -60,7 +60,8 @@ function unpackLogs(fullfilepath, filename, logkey) {
 	var status = $('#status');
 	var keyname = $('#keyname');
 	var logkeyinput = $('#logkeyinput');
-	encodedfilepath = encodeURIComponent(fullfilepath)
+	encodedfilepath = encodeURIComponent(fullfilepath);
+	console.log("Upload clicked. Trying to unpack now.");
 	unpackurl = "/unpack?fullfilepath=" + encodedfilepath + "&filename=" + filename + "&logkey=" + logkey
 	$.ajax({
 		type: "POST",

@@ -9,6 +9,7 @@ ALLOWED_EXTENSIONS = set(['zip'])
 
 bp = Blueprint('upload', __name__, url_prefix='/')
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

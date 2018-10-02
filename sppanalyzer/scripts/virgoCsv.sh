@@ -1,6 +1,7 @@
 #!/bin/bash
-# Version 0.2. Mon Aug 27 15:15:25 DST 2018
+# Version 0.4. Tue Oct  2 10:27:03 DST 2018
 # 
+# IBM Spectrum Protect Plus 10.1.1 10.1.2 
 # Creates a job index as a CSV file ./virgoLogIndex.csv .
 # 
 # Usage: 
@@ -9,16 +10,18 @@
 # But this script also works with virgo/log.log and virgo/log_[1-9].log 
 # (uncompressed).
 #
-# The CSV file is comma (',') separated.  If any of "Job Names" has a comma,
-# it will be replaced by '\,'.
+# The CSV file is comma (',') separated.  All commas in the field "SLA names"
+# will be removed.
 
-if [[ ! -f $1 ]]; then
+if [[ -f $1 ]]; then
+    FILE=$1
+else
     echo "Could not find the file $1. Aborting."
     exit 1
 fi
 
 # Create a CSV header
-echo "sessionId,epochTime,dateTime,jobType,jobName,jobStatus"\
+echo "Job ID,Start Date,Job Type,SLA Name,Success?,Target(s)"\
     > ./virgoLogIndex.csv
 
 # Ensure ./virgoLogIndex.csv can be created.
@@ -28,68 +31,96 @@ Please check the permission of the directory. Aborting."
     exit 1
 fi
 
+JOBHEADERS=$(grep -o "[0-9]\{13\} ===== Starting job for policy .*\.  id " \
+$FILE | cut -d ' ' -f 1,7-)
+# echo "$JOBHEADERS"
 
-JOBHEADERS=$(grep " [0-9]\{13\} ===== Starting job for policy " $1)
+JOBIDS=$(echo "$JOBHEADERS" | cut -c 1-13)
+# echo "$JOBIDS"
 
-JOBIDS=$(echo "$JOBHEADERS" | cut -c 128-140 | sort -u)
+JOBTS=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 4-10 | rev | tr -d '.,')
 
-TIMESTAMP_EPOCH=$(echo "$JOBIDS" | cut -c 1-10)
+JOBID_VMS_RAW=$(grep -o "  [0-9]\{13\} vmWrapper .* type vm $" $FILE | rev \
+    | cut -d ' ' -f 4- | rev | cut -d ' ' -f 3,5-)
+# echo "$JOBID_VMS_RAW"
+JOBID_APPS_RAW=$(grep -o "  [0-9]\{13\} Options for database [^:]*" $FILE \
+    | cut -d ' ' -f 3,7- )
+# echo "$JOBID_APPS_RAW"
 
-TIMESTAMP_UTC=$(echo "$JOBHEADERS" | cut -c 2-24)
+jobid_items_unifier () {
+    jobid_item=$1
 
-JOBNAMES=$(echo "$JOBHEADERS" | cut -c 172- | rev | cut -d ' ' -f 14- | rev \
-    | sed 's/,/\\,/g')
-
-JOBTYPES=$(echo "$JOBNAMES" | cut -d '_' -f 1)
-
-MSG_DETERMINER=$(grep -o \
-    " Job policy .* completed with status .* id [0-9]\{13\}" $1)
-MSG_DETERMINER_FAILEDX1=$(grep \
-    " Failed job Session [0-9]\{13\} for job name ::: " $1)
-
-JOBSUCCESS=$(echo "$JOBIDS" | while read line
+    echo "$jobid_item" | cut -d ' ' -f 1 | sort -u | while read jobid
 do
-    if   echo "$MSG_DETERMINER" | grep -q       " COMPLETED id $line"; then
-        echo "COMPLETED"
-    elif echo "$MSG_DETERMINER" | grep -q         " PARTIAL id $line"; then
-        echo "PARTIAL"
-    elif echo "$MSG_DETERMINER" | grep -q " RESOURCE ACTIVE id $line"; then
-        echo "RESOURCE ACTIVE"
-    elif echo "$MSG_DETERMINER" | grep -q          " FAILED id $line"; then
-        echo "FAILED"
-    elif echo "$MSG_DETERMINER_FAILEDX1" | grep -q "$line";            then
-        echo "FAILED"
+    items=$(echo "$jobid_item" | grep "^$jobid " | cut -d ' ' -f 2- \
+        | tr '\n' ':' | sed "s/:$/\n/g")
+    echo "$jobid $items"
+done
+}
+
+JOBID_VMS=$( jobid_items_unifier "$JOBID_VMS_RAW")
+JOBID_APPS=$(jobid_items_unifier "$JOBID_APPS_RAW")
+
+JOBNAMES=$(echo "$JOBHEADERS" | rev | cut -d ' ' -f 12- | rev)
+
+jobdetails_printer () {
+    jobnames_line=$1
+    job_item_list=$2
+    job_type=$3
+    
+    jobid=$(cut -d ' ' -f 1 <<< $jobnames_line)
+    items=$(echo "$job_item_list" | grep -m 1 "$jobid" | cut -d ' ' -f 2-)
+    slaname=$(cut -d '_' -f 2- <<< $line)
+    echo "$job_type|$slaname|$items"
+}
+    
+JOBDETAILS=$(echo "$JOBNAMES" | while read line
+do
+    if   [[ $line =~ " catalog"         ]]; then
+        echo "IBM Spectrum Protect Plus|Catalog"
+    elif [[ $line =~ " onDemandRestore" ]]; then
+        echo "IBM Spectrum Protect Plus|On-Demand Restore"
+    elif [[ $line =~ " Maintenance"     ]]; then
+        echo "IBM Spectrum Protect Plus|Maintenance"
+    elif [[ $line =~ " vmware_"          ]]; then
+        jobdetails_printer "$line" "$JOBID_VMS"  "Hypervisor - VMware"
+    elif [[ $line =~ " hyperv_"          ]]; then
+        jobdetails_printer "$line" "$JOBID_VMS"  "Hypervisor - Hyper-V"
+    elif [[ $line =~ " oracle_"          ]]; then
+        jobdetails_printer "$line" "$JOBID_APPS" "Application - Oracle"
+    elif [[ $line =~ " sql_"             ]]; then
+        jobdetails_printer "$line" "$JOBID_APPS" "Application - SQL"
+#   elif [[ $line =~ " db2"             ]]; then
+#       jobdetails_printer "$line" "$JOBID_APPS" "Application - DB2"
     else
+        echo "IBM Spectrum Protect Plus|$line"
+    fi
+done)
+
+JOBTYPES=$(echo "$JOBDETAILS" | cut -d '|' -f 1)
+SLANAMES=$(echo "$JOBDETAILS" | cut -d '|' -f 2 | tr -d ',')
+TARGETS=$( echo "$JOBDETAILS" | cut -d '|' -f 3 | tr -d ',')
+
+RESULT_RECORDS=$(grep -o "[0-9]\{13\} .* completed.*with status .*" $FILE | tac)
+RESULT=$(echo "$JOBIDS" | while read jobid
+do
+    result=$(echo "$RESULT_RECORDS" | grep "$jobid" \
+        | grep -o -m 1 "\(COMPLETED\|PARTIAL\|FAILED\|RESOURCE ACTIVE\)")
+    if [[ -z $result ]]; then
         echo "UNKNOWN"
+    else
+        echo "$result"
     fi
 done)
 
 paste -d ',' \
     <(echo "$JOBIDS") \
-    <(echo "$TIMESTAMP_EPOCH") \
-    <(echo "$TIMESTAMP_UTC") \
-    <(echo "$JOBTYPES")\
-    <(echo "$JOBNAMES")\
-    <(echo "$JOBSUCCESS")\
+    <(echo "$JOBTS") \
+    <(echo "$JOBTYPES") \
+    <(echo "$SLANAMES")\
+    <(echo "$RESULT")\
+    <(echo "$TARGETS")\
     >> ./virgoLogIndex.csv
-
-# echo "$JOBHEADERS" | while read line
-# do
-#     JOBID=$(printf "$line" | cut -c 128-140)
-#     printf "$(printf "$line" | cut -c 128-140)"
-#     printf ","
-#     printf "$(printf "$line" | cut -c 2-24) UTC"
-#     printf ","
-#     printf "$(printf "$line" | cut -c 172- | rev | cut -d ' ' -f 14- | rev \
-#         | sed 's/,/\,/g')"
-#     printf ","
-#     if echo "$JOBS_SUCCESS" | grep --quiet "$JOBID"; then
-#         printf "1"
-#     else
-#         printf "0"
-#     fi
-#     printf "\n"
-# done >> ./virgoLogIndex.csv
 
 exit $?
 
