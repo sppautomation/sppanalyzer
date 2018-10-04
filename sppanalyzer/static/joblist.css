@@ -106,3 +106,11 @@ td, th {
 	min-height: 30em;
 	text-align: left;
 }
+
+.error-msg {
+	background-color: #cc3830;
+}
+
+.warn-msg {
+	background-color:#e0da3c;
+}

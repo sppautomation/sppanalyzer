@@ -43,6 +43,7 @@ function getJobSessionInfo(logkey, sessionId) {
 		beforeSend: function() {
 		},
 		complete: function(xhr) {
+			$(".job-list-table-wrapper").removeClass('loading-overlay');
 			renderJobDetails(xhr.responseJSON, sessionId);
 		}
 	});
@@ -59,15 +60,16 @@ function renderJobDetails(jobDetails, sessionId) {
 	content = '';
 	content += '<div id="jobLogDetailsWrapper">';
 	content += '<div id="backToJoblist" class="joblist-button">BACK</div>';
+	content += '<div id="toggleInfo" class="joblist-button">TOGGLE INFO</div>';
 	content += '<div id="jobListDetails">';
 	for (var i=0;i<jobDetails.length;i++) {
 		if(jobDetails[i].includes("] ERROR"))
-			content += '<span style="background-color:#cc3830;">';
+			content += '<div class="error-msg">';
 		else if(jobDetails[i].includes("] WARN"))
-			content += '<span style="background-color:#e0da3c;">';
+			content += '<div class="warn-msg">';
 		else
-			content += '<span>';
-		content += jobDetails[i] + '</span></br></br>';
+			content += '<div class="info-msg">';
+		content += jobDetails[i] + '</div>';
 	}
 	content += '</div></div>';
 
@@ -81,6 +83,10 @@ function renderJobDetails(jobDetails, sessionId) {
 		$('#jobListTable').show();
 		$('#backToUpload').show();
 		$("#sectionTitle").html(window.applianceDetails.date);
+	});
+
+	$("#toggleInfo").click(function() {
+		$('.info-msg').toggle()
 	});
 }
 
@@ -124,7 +130,8 @@ function renderJobList(jobList) {
 	$(".job-list-table-wrapper").append(content);
 	adjustBlockTableWidth(4, "#jobListTable");
 
-	$(".jobSessionId").click(function() {
+	$(".jobSessionId").click(function(e) {
+		$(".job-list-table-wrapper").addClass('loading-overlay');
 		getJobSessionInfo($("#logkeyholder").data("logkey"), $(this).html());
 	});
 }
