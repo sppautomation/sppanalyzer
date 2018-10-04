@@ -1,6 +1,7 @@
 $(document).ready(function() {
 	var logkey = $("#logkeyholder").data("logkey");
 	getJobList(logkey);
+	getApplianceDetails(logkey);
 	$("#backToUpload").click(function() {
                 window.location.href = '/upload';
         });
@@ -21,6 +22,19 @@ function getJobList(logkey) {
 	});
 }
 
+function getApplianceDetails(logkey) {
+	appdeturl = "/analyze/applianceinfo?logkey=" + logkey;
+	$.ajax({
+                type: "GET",
+                url: appdeturl,
+                beforeSend: function() {
+                },
+                complete: function(xhr) {
+                        setApplianceDetails(xhr.responseJSON);
+                }
+        });
+}
+
 function getJobSessionInfo(logkey, sessionId) {
 	jobdetailsurl = "/analyze/jobdetails?logkey=" + logkey + "&jobsession=" + sessionId
 	$.ajax({
@@ -29,28 +43,35 @@ function getJobSessionInfo(logkey, sessionId) {
 		beforeSend: function() {
 		},
 		complete: function(xhr) {
-			renderJobDetails(xhr.responseJSON);
+			renderJobDetails(xhr.responseJSON, sessionId);
 		}
 	});
 }
 
-function renderJobDetails(jobDetails) {
+function setApplianceDetails(details) {
+	this.applianceDetails = details;
+	$('h1').html(details.name);
+	$('h2').html(details.date);
+	$('h5').html(details.release.version + " " + details.release.build)
+}
+
+function renderJobDetails(jobDetails, sessionId) {
 	content = '';
 	content += '<div id="jobLogDetailsWrapper">';
 	content += '<div id="backToJoblist" class="joblist-button">BACK</div>';
 	content += '<div id="jobListDetails">';
 	for (var i=0;i<jobDetails.length;i++) {
 		if(jobDetails[i].includes("] ERROR"))
-			content += '<span style="background-color:red;">';
+			content += '<span style="background-color:#cc3830;">';
 		else if(jobDetails[i].includes("] WARN"))
-			content += '<span style="background-color:yellow;">';
+			content += '<span style="background-color:#e0da3c;">';
 		else
 			content += '<span>';
 		content += jobDetails[i] + '</span></br></br>';
 	}
 	content += '</div></div>';
 
-	$("#sectionTitle").html("JOB DETAILS");
+	$("#sectionTitle").html(sessionId);
 	$('#jobListTable').hide();
 	$('#backToUpload').hide();
 	$(".job-list-table-wrapper").append(content);
@@ -59,7 +80,7 @@ function renderJobDetails(jobDetails) {
 		$("#jobLogDetailsWrapper").remove();
 		$('#jobListTable').show();
 		$('#backToUpload').show();
-		$("#sectionTitle").html("JOB LIST");
+		$("#sectionTitle").html(window.applianceDetails.date);
 	});
 }
 
@@ -84,13 +105,13 @@ function renderJobList(jobList) {
 		var jobTime = new Date(parseInt(job['StartDateTime'])*1000);
 		var tableDateTime = jobTime.toLocaleDateString() + " " + jobTime.toLocaleTimeString();
 		if(job['Result'].toUpperCase() != "COMPLETED" && job['Result'].toUpperCase() != "FAILED")
-			content += '<tr style="background-color:yellow;">';
+			content += '<tr style="background-color:#e0da3c;">';
 		else if(job['Result'].toUpperCase() == "FAILED")
-			content += '<tr style="background-color:red;">';
+			content += '<tr style="background-color:#cc3830;">';
 		else
 			content += '<tr>';
 		content += '<td><div class="jobSessionId">' + job['JobID'] + '</div></td>';
-		content += '<td>' + job['SLA'] + '</td>';
+		content += '<td>' + job['JobType'] + " " + job['SLA'] + '</td>';
 		content += '<td>' + tableDateTime + '</td>';
 		content += '<td>' + job['Result'] + '</td>';
 		content += '<td>' + job['Targets'].replace(/:/g,", ") + '</td>';

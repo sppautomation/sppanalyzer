@@ -36,6 +36,27 @@ def get_job_details():
     jsondata = get_jobdetails_data(logdir, jobsession)
     return jsondata
 
+@bp.route('/applianceinfo', methods=['GET'])
+def get_appliance_info():
+    logkey = request.args.get('logkey')
+    logdir = app.config['UPLOAD_FOLDER'] + "/" + logkey
+    logfullpath = get_log_fullpath(logdir)
+    logbundle = logfullpath.rsplit('/',1)[1]
+    logname = logbundle.rsplit('_logs_',1)[0]
+    logdate = logbundle.rsplit('_logs_',2)[1].replace("_","/",2).replace("_"," ",1).replace("_",":",2).replace("_"," ")
+    release = get_app_release_info(logfullpath)
+    appinfo = {}
+    appinfo['name'] = logname
+    appinfo['date'] = logdate
+    appinfo['release'] = release
+    return jsonify(appinfo)
+
+def get_app_release_info(logfullpath):
+    release = open(os.path.join(logfullpath,'release'),'r')
+    reldata = release.read()
+    release.close()
+    return json.loads(reldata.replace('\n',''))
+
 def get_log_fullpath(logdir):
     # Need to find better way here or ensure only one directory exists in logdir
     for name in os.listdir(logdir):

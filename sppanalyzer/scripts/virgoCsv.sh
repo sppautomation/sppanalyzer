@@ -73,24 +73,24 @@ jobdetails_printer () {
 JOBDETAILS=$(echo "$JOBNAMES" | while read line
 do
     if   [[ $line =~ " catalog"         ]]; then
-        echo "IBM Spectrum Protect Plus|Catalog"
+        echo "SPP|Catalog"
     elif [[ $line =~ " onDemandRestore" ]]; then
-        echo "IBM Spectrum Protect Plus|On-Demand Restore"
+        echo "SPP|On-Demand Restore"
     elif [[ $line =~ " Maintenance"     ]]; then
-        echo "IBM Spectrum Protect Plus|Maintenance"
+        echo "SPP|Maintenance"
     elif [[ $line =~ " vmware_"          ]]; then
-        jobdetails_printer "$line" "$JOBID_VMS"  "Hypervisor - VMware"
+        jobdetails_printer "$line" "$JOBID_VMS"  "VMware"
     elif [[ $line =~ " hyperv_"          ]]; then
-        jobdetails_printer "$line" "$JOBID_VMS"  "Hypervisor - Hyper-V"
+        jobdetails_printer "$line" "$JOBID_VMS"  "Hyper-V"
     elif [[ $line =~ " oracle_"          ]]; then
-        jobdetails_printer "$line" "$JOBID_APPS" "Application - Oracle"
+        jobdetails_printer "$line" "$JOBID_APPS" "Oracle"
     elif [[ $line =~ " sql_"             ]]; then
-        jobdetails_printer "$line" "$JOBID_APPS" "Application - SQL"
+        jobdetails_printer "$line" "$JOBID_APPS" "SQL"
     elif [[ $line =~ " db2_"             ]]; then
-        jobdetails_printer "$line" "$JOBID_APPS" "Application - DB2"
+        jobdetails_printer "$line" "$JOBID_APPS" "DB2"
     else
         slaname=$(echo "$line" | sed "s/^[0-9]\{13\} //g")
-        echo "IBM Spectrum Protect Plus|$slaname"
+        echo "SPP|$slaname"
     fi
 done)
 
