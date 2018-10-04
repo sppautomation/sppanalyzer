@@ -61,10 +61,13 @@ def get_joboverview_data(logdir):
 
 def get_jobdetails_data(logdir, jobsession):
     logfullpath = get_log_fullpath(logdir)
-    out, err = subprocess.Popen([os.getcwd() + "/sppanalyzer/scripts/virgoLogExtractor.sh",
+    currwd = os.getcwd()
+    os.chdir(os.getcwd() + "/sppanalyzer/scripts/")
+    out, err = subprocess.Popen([os.getcwd() + "/virgoLogExtractor.sh",
                                 logfullpath + "/virgo/log.log", jobsession],
                                 stdout=subprocess.PIPE).communicate()
     loglines = out.decode("utf-8").split("\n")
+    os.chdir(currwd)
     return jsonify(loglines)
 
 def csv_to_json(csvfile):

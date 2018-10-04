@@ -75,23 +75,25 @@ function renderJobList(jobList) {
 	content += '<th>Name</th>';
 	content += '<th>Time</th>';
 	content += '<th>Status</th>';
+	content += '<th>Resources</th>';
 	content += '</tr></thead>';
 	content += '<tbody id="jobListTableBody">';
 
 	for(var i=0;i<jobList.length;i++) {
 		var job = jobList[i];
-		var jobTime = new Date(parseInt(job['epochTime'])*1000);
+		var jobTime = new Date(parseInt(job['StartDateTime'])*1000);
 		var tableDateTime = jobTime.toLocaleDateString() + " " + jobTime.toLocaleTimeString();
-		if(job['jobStatus'].toUpperCase() != "COMPLETED" && job['jobStatus'].toUpperCase() != "FAILED")
+		if(job['Result'].toUpperCase() != "COMPLETED" && job['Result'].toUpperCase() != "FAILED")
 			content += '<tr style="background-color:yellow;">';
-		else if(job['jobStatus'].toUpperCase() == "FAILED")
+		else if(job['Result'].toUpperCase() == "FAILED")
 			content += '<tr style="background-color:red;">';
 		else
 			content += '<tr>';
-		content += '<td><div class="jobSessionId">' + job['sessionId'] + '</div></td>';
-		content += '<td>' + job['jobName'] + '</td>';
+		content += '<td><div class="jobSessionId">' + job['JobID'] + '</div></td>';
+		content += '<td>' + job['SLA'] + '</td>';
 		content += '<td>' + tableDateTime + '</td>';
-		content += '<td>' + job['jobStatus'] + '</td>';
+		content += '<td>' + job['Result'] + '</td>';
+		content += '<td>' + job['Targets'].replace(/:/g,", ") + '</td>';
 		content += '</tr>';
 	}
 
