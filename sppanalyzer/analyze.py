@@ -74,9 +74,10 @@ def virgo_log_exists(virgolog, logdir):
 def get_joboverview_data(logdir):
     logfullpath = get_log_fullpath(logdir)
     #check if exists first
-    subprocess.check_call([os.getcwd() + "/sppanalyzer/scripts/virgoCsv.sh",
-                           logfullpath + "/virgo/all_logs.log"],
-                           cwd=logdir)
+    if not os.path.isfile(os.path.join(logdir, 'virgoLogIndex.csv')):
+        subprocess.check_call([os.getcwd() + "/sppanalyzer/scripts/virgoCsv.sh",
+                               logfullpath + "/virgo/all_logs.log"],
+                               cwd=logdir)
     csvfile = logdir + '/virgoLogIndex.csv'
     return csv_to_json(csvfile)
 
