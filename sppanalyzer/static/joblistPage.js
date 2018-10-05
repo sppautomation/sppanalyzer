@@ -134,6 +134,8 @@ function renderJobList(jobList) {
 		$(".job-list-table-wrapper").addClass('loading-overlay');
 		getJobSessionInfo($("#logkeyholder").data("logkey"), $(this).html());
 	});
+
+	$('#jobListTable').tablesorter({sortList: [[2,1]]});
 }
 
 function adjustBlockTableWidth(numCols, tableSelector) {

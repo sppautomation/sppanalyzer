@@ -75,7 +75,7 @@ def get_joboverview_data(logdir):
     logfullpath = get_log_fullpath(logdir)
     #check if exists first
     subprocess.check_call([os.getcwd() + "/sppanalyzer/scripts/virgoCsv.sh",
-                           logfullpath + "/virgo/log.log"],
+                           logfullpath + "/virgo/all_logs.log"],
                            cwd=logdir)
     csvfile = logdir + '/virgoLogIndex.csv'
     return csv_to_json(csvfile)
@@ -85,7 +85,7 @@ def get_jobdetails_data(logdir, jobsession):
     currwd = os.getcwd()
     os.chdir(os.getcwd() + "/sppanalyzer/scripts/")
     out, err = subprocess.Popen([os.getcwd() + "/virgoLogExtractor.sh",
-                                logfullpath + "/virgo/log.log", jobsession],
+                                logfullpath + "/virgo/all_logs.log", jobsession],
                                 stdout=subprocess.PIPE).communicate()
     loglines = out.decode("utf-8").split("\n")
     os.chdir(currwd)

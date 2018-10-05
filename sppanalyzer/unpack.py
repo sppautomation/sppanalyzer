@@ -1,6 +1,8 @@
 import os
 import zipfile
 import gzip
+import re
+from glob import glob
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
@@ -37,9 +39,30 @@ def unpack_log_file():
                     zip.extractall(os.path.join(root,newfolder))
                     zip.close()
                     os.remove(os.path.join(root,filename))
+        combine_virgo_logs(fullfilepath)
         return jsonify({"status":"UNPACKED","path":fullfilepath,"logkey":logkey})
     except:
         return jsonify({"status":"ERROR","logkey":logkey})
 
-def unify_virgo_log(fullfilepath):
-    return None
+def combine_virgo_logs(fullfilepath):
+    virgopath = os.path.join(get_log_fullpath(fullfilepath), "virgo")
+    output = open(os.path.join(virgopath,"all_logs.log"), "w", buffering=1024)
+    logfiles = glob(os.path.join(virgopath,"log*.log"))
+    logfiles.sort(key=natural_keys, reverse=True)
+    for fname in logfiles:
+        with open(fname) as f:
+            for line in f:
+                output.write(line)
+        f.close()
+    output.close()
+
+def atoi(text):
+    return int(text) if text.isdigit() else text
+
+def natural_keys(text):
+    return [ atoi(c) for c in re.split('(\d+)', text) ]
+
+def get_log_fullpath(logdir):
+    for name in os.listdir(logdir):
+        if os.path.isdir(os.path.join(logdir,name)):
+            return os.path.join(logdir,name)
