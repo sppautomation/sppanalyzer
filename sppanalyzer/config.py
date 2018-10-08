@@ -1,1 +1,2 @@
 UPLOAD_FOLDER = '/sppanalyzer'
+FILE_EXPIRATION_TIME = 0
