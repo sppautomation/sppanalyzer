@@ -1,5 +1,6 @@
 import os
 import time
+import shutil
 from flask import Blueprint, current_app as app
 
 bp = Blueprint('delete', __name__, url_prefix='/delete')
@@ -8,7 +9,7 @@ bp = Blueprint('delete', __name__, url_prefix='/delete')
 def delete_old_logs():
     now = time.time()
     for name in os.listdir(app.config["UPLOAD_FOLDER"]):
-        dir = os.path.join(app.config["UPLOAD_FOLDER"], name)
-        if os.path.isdir(dir):
-            if os.stat(dir).st_mtime < now - (app.config["FILE_EXPIRATION_TIME"] * 86400):
-                os.rmdir(dir)
+        log_dir = os.path.join(app.config["UPLOAD_FOLDER"], name)
+        if os.path.isdir(log_dir):
+            if os.stat(log_dir).st_mtime < now - (app.config["FILE_EXPIRATION_TIME"] * 86400):
+                shutil.rmtree(log_dir, ignore_errors=True)
