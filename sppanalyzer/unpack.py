@@ -54,6 +54,7 @@ def combine_virgo_logs(fullfilepath):
             for line in f:
                 output.write(line)
         f.close()
+        os.remove(fname)
     output.close()
 
 def atoi(text):
