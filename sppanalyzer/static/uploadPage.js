@@ -45,12 +45,16 @@ $(document).ready(function() {
 				percent.html(percentVal);
 			},
 			complete: function(xhr) {
-				status.html(xhr.responseJSON.status);
+				status.html(xhr.responseJSON.message);
 				status.removeClass("blinking-div");
 				percent.addClass("hiddenvis");
-				unpackLogs(xhr.responseJSON.fullfilepath,
-				xhr.responseJSON.filename,
-				xhr.responseJSON.logkey);
+				if(xhr.response == 200) {
+					unpackLogs(xhr.responseJSON.fullfilepath,
+					xhr.responseJSON.filename,
+					xhr.responseJSON.logkey);
+				} else {
+					$("#uploadSubmit").removeClass("hiddenvis");
+				}
 			}
 		});
 	});
@@ -73,7 +77,7 @@ function unpackLogs(fullfilepath, filename, logkey) {
 		},
 		complete: function(xhr) {
 			status.removeClass("blinking-div");
-			status.html(xhr.responseJSON.status);
+			status.html(xhr.responseJSON.message);
 			keyname.removeClass("hiddenvis");
 			keyname.html("LOG KEY: " + xhr.responseJSON.logkey);
 			logkeyinput.val(xhr.responseJSON.logkey);

@@ -1,1 +1,2 @@
 UPLOAD_FOLDER = '/sppanalyzer'
+SPACE_THRESHOLD = 100000
