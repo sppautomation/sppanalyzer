@@ -48,7 +48,7 @@ $(document).ready(function() {
 				status.html(xhr.responseJSON.message);
 				status.removeClass("blinking-div");
 				percent.addClass("hiddenvis");
-				if(xhr.response == 200) {
+				if(xhr.status == 200) {
 					unpackLogs(xhr.responseJSON.fullfilepath,
 					xhr.responseJSON.filename,
 					xhr.responseJSON.logkey);
