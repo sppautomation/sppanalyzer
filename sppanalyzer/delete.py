@@ -1,7 +1,6 @@
 import os
 import time
 from flask import Blueprint, current_app as app
-from flask import
 
 bp = Blueprint('delete', __name__, url_prefix='/delete')
 

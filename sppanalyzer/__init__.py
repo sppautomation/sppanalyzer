@@ -26,5 +26,8 @@ app.register_blueprint(unpack.bp)
 from . import analyze
 app.register_blueprint(analyze.bp)
 
+from . import delete
+app.register_blueprint(delete.bp)
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
