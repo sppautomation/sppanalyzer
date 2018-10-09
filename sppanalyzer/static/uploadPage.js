@@ -34,6 +34,7 @@ $(document).ready(function() {
 				status.empty();
 				var percentVal = '0%';
 				percent.html(percentVal);
+				$("#uploadSubmit").addClass("hiddenvis");
 				status.removeClass("hiddenvis");
 				percent.removeClass("hiddenvis");
 				status.addClass("blinking-div");
@@ -76,6 +77,7 @@ function unpackLogs(fullfilepath, filename, logkey) {
 			keyname.removeClass("hiddenvis");
 			keyname.html("LOG KEY: " + xhr.responseJSON.logkey);
 			logkeyinput.val(xhr.responseJSON.logkey);
+			$("#uploadSubmit").removeClass("hiddenvis");
 		}
 	});
 }
