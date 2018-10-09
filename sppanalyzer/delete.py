@@ -5,7 +5,8 @@ from flask import Blueprint, current_app as app, jsonify
 
 bp = Blueprint('delete', __name__, url_prefix='/delete')
 
-@bp.route("", methods=["OPTIONS", "POST", "GET"])  #Doesn't matter which we end up implementing
+
+@bp.route("", methods=["OPTIONS", "POST"])
 def delete_old_logs():
     now = time.time()
     try:
