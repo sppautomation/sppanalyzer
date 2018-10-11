@@ -1,7 +1,7 @@
 import os
 import random
 import string
-from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify, Response
+from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify, Response, make_response
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 
@@ -35,7 +35,9 @@ def upload_file():
             file.save(os.path.join(fullfilepath, filename))
             return jsonify({"message":"COMPLETE","fullfilepath":fullfilepath,"filename":filename,"logkey":logkey})
     #for GET return page template
-    return render_template('upload.html')
+    res = make_response(render_template('upload.html'))
+    res.cache_control.no_cache = True
+    return res
 
 def free_space_available():
     fs = os.statvfs(app.config['UPLOAD_FOLDER'])

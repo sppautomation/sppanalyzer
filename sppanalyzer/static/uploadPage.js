@@ -1,4 +1,5 @@
 $(document).ready(function() {
+	displayRecentLogKeys();
 	var inputs = document.querySelectorAll( '#file' );
 	Array.prototype.forEach.call( inputs, function( input )
 	{
@@ -113,8 +114,60 @@ function analyzeLogs() {
 			if(xhr.responseJSON) {
 				alert(xhr.responseJSON.message);
 			} else {
+				appendLogKeyCookie(logkey);
 				window.location.href = analyzeurl;
 			}
 		}
 	});
+}
+
+function getCookie(cname) {
+	var name = cname + "=";
+	var decodedCookie = decodeURIComponent(document.cookie);
+	var ca = decodedCookie.split(';');
+	for(var i = 0; i <ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) == ' ') {
+			c = c.substring(1);
+		}
+        	if (c.indexOf(name) == 0) {
+			return c.substring(name.length, c.length);
+		}
+	}
+	return "";
+}
+
+function appendLogKeyCookie(logkey) {
+	curvals = getCookie("logkeys");
+	if(curvals.length == 0) {
+		document.cookie = "logkeys=" + logkey;
+	} else {
+		logkeyarray = curvals.split(",");
+		if(!logkeyarray.includes(logkey)) {
+			logkeyarray.push(logkey)
+		}
+		if(logkeyarray.length > 4) {
+			logkeyarray.shift();
+		}
+		document.cookie = "logkeys=" + logkeyarray.toString();
+	}
+}
+
+function displayRecentLogKeys() {
+	logkeys = getCookie("logkeys");
+	if(logkeys.length > 0) {
+		$('#recentLogLinksHdr').toggle();
+		$('#recentLogLinks').toggle();
+		logkeyarray = logkeys.split(',');
+		logkeyarray.forEach(function(logkey) {
+			var content = "";
+			content = "<a href=";
+			content += "/analyze/joblist?logkey=";
+			content += logkey;
+			content += ">";
+			content += logkey;
+			content += "</a>";
+			$('#recentLogLinks').append(content + " ");
+		});
+	}
 }
