@@ -78,6 +78,8 @@ function renderJobDetails(jobDetails, sessionId) {
 	$('#backToUpload').hide();
 	$(".job-list-table-wrapper").append(content);
 
+	$('.info-msg').toggle();
+
 	$("#backToJoblist").click(function() {
 		$("#jobLogDetailsWrapper").remove();
 		$('#jobListTable').show();
@@ -86,7 +88,7 @@ function renderJobDetails(jobDetails, sessionId) {
 	});
 
 	$("#toggleInfo").click(function() {
-		$('.info-msg').toggle()
+		$('.info-msg').toggle();
 	});
 }
 
