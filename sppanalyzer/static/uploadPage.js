@@ -20,6 +20,7 @@ $(document).ready(function() {
 
 	$("#uploadSubmit").click(function() {
 		$('#uploadForm').submit();
+		deleteOldLogs();
 	});
 
 	$(".logviewbutton").click(function() {
@@ -83,6 +84,16 @@ function unpackLogs(fullfilepath, filename, logkey) {
 			logkeyinput.val(xhr.responseJSON.logkey);
 			$("#uploadSubmit").removeClass("hiddenvis");
 		}
+	});
+}
+
+function deleteOldLogs() {
+	$.ajax({
+			type: "POST",
+			url: "/delete",
+			complete: function(xhr) {
+				console.log("Cleaning old logs, status " + xhr.status);
+			}
 	});
 }
 
