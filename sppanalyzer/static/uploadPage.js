@@ -41,6 +41,7 @@ $(document).ready(function() {
 				percent.removeClass("hiddenvis");
 				status.addClass("blinking-div");
 			},
+			timeout: 0,
 			uploadProgress: function(event, position, total, percentComplete) {
 				status.html("UPLOADING")
 				var percentVal = percentComplete + '%';
@@ -73,6 +74,7 @@ function unpackLogs(fullfilepath, filename, logkey) {
 	$.ajax({
 		type: "POST",
 		url: unpackurl,
+		timeout: 0,
 		beforeSend: function() {
 			status.addClass("blinking-div");
 			status.html("UNPACKING");
