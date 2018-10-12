@@ -54,6 +54,32 @@ function setApplianceDetails(details) {
 	$('h1').html(details.name);
 	$('h2').html(details.date);
 	$('h5').html(details.release.version + " " + details.release.build)
+	$('#releaseInfo').click(function() {
+		renderRpmDetails(details.rpminfo);
+	});
+}
+
+function renderRpmDetails(rpminfo) {
+	$('#releaseInfo').toggle();
+	content = '';
+	content += '<div id="rpmDetailsWrapper">';
+	content += '<div id="backToJoblist" class="joblist-button">BACK</div>';
+	content += '<div id="rpmDetails">';
+	rpminfo.forEach(function(element) {
+		content += '<div>' + element + '</div>';
+	});
+	content += '</div></div>';
+
+	$('#jobListTable').hide();
+        $('#backToUpload').hide();
+        $(".job-list-table-wrapper").append(content);
+
+        $("#backToJoblist").click(function() {
+                $("#jobLogDetailsWrapper").remove();
+                $('#jobListTable').show();
+                $('#backToUpload').show();
+		$('#releaseInfo').toggle();
+        });
 }
 
 function renderJobDetails(jobDetails, sessionId) {

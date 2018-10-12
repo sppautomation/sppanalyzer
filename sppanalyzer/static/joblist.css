@@ -11,6 +11,12 @@
 	background-color: lightgray;
 }
 
+#rpmDetails {
+	background-color: lightgray;
+	height: 35em;
+	overflow-y: auto;
+}
+
 #jobLogDetailsWrapper {
 	text-align: left;
 }
@@ -119,4 +125,10 @@ th {
 
 .warn-msg {
 	background-color:#e0da3c;
+}
+
+#releaseInfo {
+	color: blue;
+        text-decoration: underline;
+	cursor: pointer;
 }

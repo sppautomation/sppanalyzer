@@ -45,10 +45,12 @@ def get_appliance_info():
     logname = logbundle.rsplit('_logs_',1)[0]
     logdate = logbundle.rsplit('_logs_',2)[1].replace("_","/",2).replace("_"," ",1).replace("_",":",2).replace("_"," ")
     release = get_app_release_info(logfullpath)
+    rpminfo = get_rpm_info(logfullpath)
     appinfo = {}
     appinfo['name'] = logname
     appinfo['date'] = logdate
     appinfo['release'] = release
+    appinfo['rpminfo'] = rpminfo
     return jsonify(appinfo)
 
 def get_app_release_info(logfullpath):
@@ -56,6 +58,12 @@ def get_app_release_info(logfullpath):
     reldata = release.read()
     release.close()
     return json.loads(reldata.replace('\n',''))
+
+def get_rpm_info(logfullpath):
+    with open(os.path.join(logfullpath,'system/rpminfo.txt'),'r') as f:
+        rpminfo = f.readlines()
+    rpminfo = [l.strip() for l in rpminfo]
+    return rpminfo
 
 def get_log_fullpath(logdir):
     # Need to find better way here or ensure only one directory exists in logdir
