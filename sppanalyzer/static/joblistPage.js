@@ -63,7 +63,7 @@ function renderRpmDetails(rpminfo) {
 	$('#releaseInfo').toggle();
 	content = '';
 	content += '<div id="rpmDetailsWrapper">';
-	content += '<div id="backToJoblist" class="joblist-button">BACK</div>';
+	content += '<div id="rpmBackToJoblist" class="joblist-button">BACK</div>';
 	content += '<div id="rpmDetails">';
 	rpminfo.forEach(function(element) {
 		content += '<div>' + element + '</div>';
@@ -74,8 +74,8 @@ function renderRpmDetails(rpminfo) {
         $('#backToUpload').hide();
         $(".job-list-table-wrapper").append(content);
 
-        $("#backToJoblist").click(function() {
-                $("#jobLogDetailsWrapper").remove();
+        $("#rpmBackToJoblist").click(function() {
+                $("#rpmDetailsWrapper").remove();
                 $('#jobListTable').show();
                 $('#backToUpload').show();
 		$('#releaseInfo').toggle();
