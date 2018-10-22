@@ -89,13 +89,19 @@ function renderJobDetails(jobDetails, sessionId) {
 	content += '<div id="toggleInfo" class="joblist-button">TOGGLE INFO</div>';
 	content += '<div id="jobListDetails">';
 	for (var i=0;i<jobDetails.length;i++) {
-		if(jobDetails[i].includes("] ERROR"))
+		if(jobDetails[i].loglevel == "ERROR")
 			content += '<div class="error-msg">';
-		else if(jobDetails[i].includes("] WARN"))
+		else if(jobDetails[i].loglevel == "WARN")
 			content += '<div class="warn-msg">';
 		else
 			content += '<div class="info-msg">';
-		content += jobDetails[i] + '</div>';
+		content += jobDetails[i].date + " ";
+		content += jobDetails[i].loglevel + " ";
+		content += jobDetails[i].thread + " ";
+		content += jobDetails[i].class + " ";
+		content += jobDetails[i].sessionid + " ";
+		content += jobDetails[i].message;
+		content += '</div>';
 	}
 	content += '</div></div>';
 

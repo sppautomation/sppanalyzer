@@ -1,5 +1,6 @@
 import os
 import csv
+import re
 import json
 import subprocess
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
@@ -96,7 +97,21 @@ def get_jobdetails_data(logdir, jobsession):
     out, err = subprocess.Popen([os.getcwd() + "/virgoLogExtractor.sh",
                                 logfullpath + "/virgo/all_logs.log", jobsession],
                                 stdout=subprocess.PIPE).communicate()
-    loglines = out.decode("utf-8").split("\n")
+    loglines = out.decode('utf-8').splitlines()
+    for i, line in enumerate(loglines, 0):
+        while not loglines[i].startswith("["):
+            loglines[i-1] = loglines[i-1] + "\n" + loglines[i]
+            del loglines[i]
+    for i, line in enumerate(loglines, 0):
+        logobj = {}
+        logelements = re.split("\s+",line,5)
+        logobj['date'] = logelements[0]
+        logobj['loglevel'] = logelements[1]
+        logobj['thread'] = logelements[2]
+        logobj['class'] = logelements[3]
+        logobj['sessionid'] = logelements[4]
+        logobj['message'] = logelements[5]
+        loglines[i] = logobj
     os.chdir(currwd)
     return jsonify(loglines)
 
