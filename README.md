@@ -1,20 +1,39 @@
 # SPP Analyzer
 
+## Description
+
+The SPP Log analyzer was created to help support engineers parse and read logcollect bundles created by the SPP appliance.
+
+Sppanalyzer runs as a web application.
+
+sppanalyzer uses the Python-based Flask framework. Flask is a lightweight web framework used to create web applications.
+
+http://flask.pocoo.org/docs/1.0/
+
+```
+Users can upload system log zip bundles to the server
+The server unpacks/unzips the log bundles automatically
+Logs are stored using a unique "key" which allows users to return to log analysis without re-uploading
+Output is arranged at a top level by job session
+  Information about the job session such as start date, status, and associated resources is displayed
+Each job session can be analyzed to output related log messages
+```
+
 ## Deployment
 
 ### Options
 The Flask framework has many different options for deployment.
 Based on current architecture a Linux platform is required in order to run the text parsing scripts.
-```
+
 http://flask.pocoo.org/docs/1.0/deploying/
-```
+
 
 ### Example
 Our internal environment is running CentOS 7 and using the uWSGI service running on port 3000 which forwards to Apache running on the default HTTP port 80.
-The following guide outlines the installation of uWSGI, Apache, Python, and other dependencies on CentOS7
-```
+The following guide outlines the installation of uWSGI, Apache, Python, and other dependencies on CentOS7:
+
 https://mitchjacksontech.github.io/How-To-Flask-Python-Centos7-Apache-uWSGI/
-```
+
 
 ### uWSGI Example Configuration Files
 
