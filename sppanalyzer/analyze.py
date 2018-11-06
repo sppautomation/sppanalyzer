@@ -6,7 +6,7 @@ import subprocess
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
-from parser import Parser
+from ./parser import Parser
 
 bp = Blueprint('analyze', __name__, url_prefix='/analyze')
 
