@@ -6,6 +6,7 @@ import subprocess
 from flask import Flask, flash, request, redirect, url_for, Blueprint, render_template, jsonify
 from flask import current_app as app
 from werkzeug.utils import secure_filename
+from parser import Parser
 
 bp = Blueprint('analyze', __name__, url_prefix='/analyze')
 
@@ -82,13 +83,16 @@ def virgo_log_exists(virgolog, logdir):
 
 def get_joboverview_data(logdir):
     logfullpath = get_log_fullpath(logdir)
+    parser = Parser(logfullpath + "/virgo/all_logs.log")
+    return jsonify(parser.get_joboverview_data())
     #check if exists first
-    if not os.path.isfile(os.path.join(logdir, 'virgoLogIndex.csv')):
-        subprocess.check_call([os.getcwd() + "/sppanalyzer/scripts/virgoCsv.sh",
-                               logfullpath + "/virgo/all_logs.log"],
-                               cwd=logdir)
-    csvfile = logdir + '/virgoLogIndex.csv'
-    return csv_to_json(csvfile)
+    # if not os.path.isfile(os.path.join(logdir, 'virgoLogIndex.csv')):
+    #     subprocess.check_call([os.getcwd() + "/sppanalyzer/scripts/virgoCsv.sh",
+    #                            logfullpath + "/virgo/all_logs.log"],
+    #                            cwd=logdir)
+    # csvfile = logdir + '/virgoLogIndex.csv'
+    # return csv_to_json(csvfile)
+
 
 def get_jobdetails_data(logdir, jobsession):
     logfullpath = get_log_fullpath(logdir)
