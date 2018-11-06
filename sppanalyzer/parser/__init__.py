@@ -1,5 +1,4 @@
 import re
-import json
 
 catalog_matcher = re.compile("catalog")
 on_demand_restore_matcher = re.compile("onDemandRestore")
@@ -58,7 +57,6 @@ class Parser:
             job_type = "SPP"
             sla_name = job_name
         return sla_name, job_type
-
 
     def get_joboverview_data(self):
         universal_dict = {}
