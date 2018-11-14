@@ -99,7 +99,6 @@ def get_jobdetails_data(logdir, jobsession):
                                 stdout=subprocess.PIPE).communicate()
     loglines = out.decode('utf-8').splitlines()
     for i, line in enumerate(loglines, 0):
-        print(line)
         while not loglines[i].startswith("["):
             loglines[i-1] = loglines[i-1] + "\n" + loglines[i]
             del loglines[i]
