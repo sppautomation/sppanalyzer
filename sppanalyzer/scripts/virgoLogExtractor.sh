@@ -58,7 +58,7 @@ RECORDS=$(\
     grep -no "^\[20..-..-..[ T]..:..:..\..\{3,4\}\] ..... .\{93,94\}  $JOBID " \
     $FILE)
 
-echo "Records are:\n $RECORDS"
+echo -e $("Records are:\n {RECORDS}")
 
 LNS_INFO=$(
 if [[ "$MODE" == "1" ]] || [[ "$MODE" == "3" ]] || [[ "$MODE" == "5" ]]\
