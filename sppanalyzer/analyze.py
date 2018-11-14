@@ -196,7 +196,7 @@ class Parser:
                 val = vm.group(0).split(' ')[2]
                 if universal_dict.get(key) is None:
                     universal_dict[key] = {}
-                    universal_dict[key]["JobId"] = key
+                    universal_dict[key]["JobID"] = key
                 universal_dict[key]["Targets"] = universal_dict[key]["Targets"] + f":{val}" if universal_dict[key][
                     "Targets"] else f"{val}"
                 continue
@@ -206,7 +206,7 @@ class Parser:
                 val = job_apps.group(0).split(' ')[4][0:-3]
                 if universal_dict.get(key) is None:
                     universal_dict[key] = {}
-                    universal_dict[key]["JobId"] = key
+                    universal_dict[key]["JobID"] = key
                 universal_dict[key]["Targets"] = universal_dict[key]["Targets"] + f":{val}" if universal_dict[key][
                     "Targets"] else f"{val}"
                 continue
@@ -216,7 +216,7 @@ class Parser:
                 key = job_id_pattern.search(line).group(0)
                 if universal_dict.get(key) is None:
                     universal_dict[key] = {}
-                    universal_dict[key]["JobId"] = key
+                    universal_dict[key]["JobID"] = key
                 if completion_type:
                     universal_dict[key]["Result"] = completion_type.group(0)
                 else:
