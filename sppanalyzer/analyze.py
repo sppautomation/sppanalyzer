@@ -113,6 +113,7 @@ def get_jobdetails_data(logdir, jobsession):
         logobj['message'] = logelements[5]
         loglines[i] = logobj
     os.chdir(currwd)
+    print(loglines)
     return jsonify(loglines)
 
 def csv_to_json(csvfile):
