@@ -89,7 +89,7 @@ def virgo_log_exists(virgolog, logdir):
 
 
 def get_joboverview_data(logdir):
-    logfullpath = get_log_fullpath(logdir)
+    logfullpath = get_log_fullpath(logdir) + "/virgo/all_logs.log"
     p = Parser()
     return jsonify(p.get_joboverview_data(logfullpath))
 
