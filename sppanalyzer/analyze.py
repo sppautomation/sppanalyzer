@@ -93,7 +93,9 @@ def get_joboverview_data(logdir):
 def get_jobdetails_data(logdir, jobsession):
     logfullpath = get_log_fullpath(logdir)
     loglines = []
-    pattern = re.compile(jobsession)
+    pattern = re.compile(".{90,110}" + jobsession) # variable number,
+    # mainly to avoid matches where the jobsession is contained later in the line,
+    #  even though the jobsession is not the right one. If there's a smarter way, need to change #TODO
     with open(logfullpath + "/virgo/all_logs.log", "r") as f:
         for line in f:
             job_id = pattern.search(line)
