@@ -92,27 +92,23 @@ def get_joboverview_data(logdir):
 
 def get_jobdetails_data(logdir, jobsession):
     logfullpath = get_log_fullpath(logdir)
-    currwd = os.getcwd()
-    os.chdir(os.getcwd() + "/sppanalyzer/scripts/")
-    out, err = subprocess.Popen([os.getcwd() + "/virgoLogExtractor.sh",
-                                logfullpath + "/virgo/all_logs.log", jobsession],
-                                stdout=subprocess.PIPE).communicate()
-    loglines = out.decode('utf-8').splitlines()
-    for i, line in enumerate(loglines, 0):
-        while not loglines[i].startswith("["):
-            loglines[i-1] = loglines[i-1] + "\n" + loglines[i]
-            del loglines[i]
-    for i, line in enumerate(loglines, 0):
-        logobj = {}
-        logelements = re.split("\s+",line,5)
-        logobj['date'] = logelements[0]
-        logobj['loglevel'] = logelements[1]
-        logobj['thread'] = logelements[2]
-        logobj['class'] = logelements[3]
-        logobj['sessionid'] = logelements[4]
-        logobj['message'] = logelements[5]
-        loglines[i] = logobj
-    os.chdir(currwd)
+    loglines = []
+    pattern = re.compile(".{90,110}" + jobsession) # variable number,
+    # mainly to avoid matches where the jobsession is contained later in the line,
+    #  even though the jobsession is not the right one. If there's a smarter way, need to change #TODO
+    with open(logfullpath + "/virgo/all_logs.log", "r") as f:
+        for line in f:
+            job_id = pattern.search(line)
+            if (job_id):
+                curr_dict = {}
+                l = re.sub("\s+", " ", line).split(" ")
+                curr_dict['date'] = l[0]
+                curr_dict['loglevel'] = l[1]
+                curr_dict['thread'] = l[2]
+                curr_dict['class'] = l[3]
+                curr_dict['sessionid'] = l[4]
+                curr_dict['message'] = " ".join(l[5:])
+                loglines.append(curr_dict)
     return jsonify(loglines)
 
 def csv_to_json(csvfile):
